@@ -165,7 +165,7 @@ export class ScannComponent implements AfterViewInit, OnInit {
     if (this.listQr.length > 1 || this.isUrlValido(text)) {
       this.esQr = true;
       console.log('Es un QR valido de la SET');
-      this.buscarCdc(text);
+      this.buscarEnQr(text);
       this.dialog.closeAll();
       return true;
     } else if (this.datosQrVirtual(text)) {
@@ -190,12 +190,39 @@ export class ScannComponent implements AfterViewInit, OnInit {
     return text.toLowerCase().includes(param.toLowerCase());
   }
 
-  buscarCdc(param: string) {
+  buscarEnQr(param: string) {
     this.text = '';
     this.facturaVirtual = false;
     this.otrosTiposFacturas = false;
     this.facturaElectronica = true;
     this.CDC = this.busquedaDatosQr(param, 'Id=', null, null, null, null, '&');
+    this.rucReceptor = this.busquedaDatosQr(
+      param,
+      'dRucRec=',
+      null,
+      null,
+      null,
+      null,
+      '&'
+    );
+    this.montoTotal = this.busquedaDatosQr(
+      param,
+      'dTotGralOpe=',
+      null,
+      null,
+      null,
+      null,
+      '&'
+    );
+    this.montoTotalIVA = this.busquedaDatosQr(
+      param,
+      'dTotIVA=',
+      null,
+      null,
+      null,
+      null,
+      '&'
+    );
   }
 
   datosQrVirtual(param: string): boolean {
