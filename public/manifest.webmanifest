@@ -1,7 +1,7 @@
 {
-  "name": "innova_facturas_front",
-  "short_name": "innova_facturas_front",
-  "theme_color": "#1976d2",
+  "name": "Innova Facturas",
+  "short_name": "InnovaFacturas",
+  "theme_color": "#5260ff",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "./",
