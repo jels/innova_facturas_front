@@ -61,7 +61,7 @@
 
         </div>
         <div class="col col-lg-4"></div>
-        <div class="col col-lg-12">
+        <div class="col col-lg-12" [hidden]="true">
             @for (item of qrCodeResult; track $index) {
             <div>
                 <ngx-scanner-qrcode #actionFile="scanner" [src]="item.url" [config]="config" (event)="onEvent($event)"
@@ -388,8 +388,6 @@
                 </mat-form-field>
             </div>
         </div>
-
-
         }
 
         @if (otrosTiposFacturas) {
@@ -531,6 +529,20 @@
         </div>
 
         }
+        <div [hidden]="!scaneoRealizado">
+            <div class="container">
+                <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col-6 d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/dashboard" class="btn btn-primary" tabindex="-1" role="button"
+                            aria-disabled="true">Guardar</a>
+                        <a href="/dashboard" class="btn btn-primary" tabindex="-1" role="button" aria-disabled="true"
+                            (click)="clean()">Cancelar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
 
     </form>
 </div>

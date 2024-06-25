@@ -1,0 +1,9 @@
+.form-scanner {
+    min-width: 75%;
+    max-width: 100%;
+    width: 100%;
+}
+
+.form-scanner-full-width {
+    width: 100%;
+}
