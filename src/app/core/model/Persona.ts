@@ -9,8 +9,8 @@ export class Persona {
   statusPersona: string;
   createdAt: Date;
   updatedAt: Date;
-  updatedBy: User;
-  createdBy: User;
+  updatedBy: User | null;
+  createdBy: User | null;
 
   constructor(
     idPersona: number,

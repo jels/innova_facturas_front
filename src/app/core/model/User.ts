@@ -2,7 +2,7 @@ import { Persona } from './Persona';
 import { Rol } from './Rol';
 
 export class User {
-  idUser: number;
+  idUser: number | null;
   rol: Rol;
   username: string;
   password: string;
@@ -11,7 +11,7 @@ export class User {
   updatedAt: Date;
   persona: Persona;
   statusUser: string;
-  createdBy: User;
+  createdBy: User | null;
 
   constructor(
     idUser: number,

@@ -8,9 +8,17 @@ import {
 
 import { SafePipe } from '../../shared/pipes/safe.pipe';
 
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  Validators,
+  FormControl,
+  ReactiveFormsModule,
+} from '@angular/forms';
 
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 
 import {
   LOAD_WASM,
@@ -30,6 +38,13 @@ import { createWorker } from 'tesseract.js';
 import { LoadingComponent } from '../../shared/components/modal/loading/loading.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { Factura } from '../../core/model/Factura';
+import { FacturaService } from '../../core/services/factura.service';
+import { UserService } from '../../core/services/user.service';
+import { User } from '../../core/model/User';
+import { Rol } from '../../core/model/Rol';
+import { FechaPipe } from '../../shared/pipes/fecha.pipe';
 
 @Component({
   selector: 'app-scann',
@@ -42,6 +57,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     SafePipe,
     LoadingComponent,
     MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    ReactiveFormsModule,
+    FechaPipe,
   ],
   templateUrl: './scann.component.html',
   styleUrl: './scann.component.scss',
@@ -49,7 +68,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 export class ScannComponent implements AfterViewInit, OnInit {
   readonly dialog = inject(MatDialog);
 
-  CDC = '';
+  idUser = 1;
+  user: User;
+
+  camposValidos: boolean = true;
+
+  formElectronica: FormGroup;
+  formVirtual: FormGroup;
+  formFactura: FormGroup;
+
+  cdc = '';
   facturaVirtual = false;
   facturaElectronica = false;
   otrosTiposFacturas = false;
@@ -112,17 +140,136 @@ export class ScannComponent implements AfterViewInit, OnInit {
 
   @ViewChild('action') action!: NgxScannerQrcodeComponent;
 
-  constructor(private qrcode: NgxScannerQrcodeService) {}
+  constructor(
+    private qrcode: NgxScannerQrcodeService,
+    private fb: FormBuilder,
+    private _facturaService: FacturaService,
+    private _userService: UserService,
+    private fechaPipe: FechaPipe
+  ) {
+    this.user = {
+      idUser: null,
+      rol: {
+        idRol: 0,
+        nombreRol: '',
+        statusRol: '',
+        createdAt: new Date(),
+        createdBy: null,
+        updatedAt: new Date(),
+        updatedBy: null,
+      },
+      username: '',
+      password: '',
+      lastLogin: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      persona: {
+        idPersona: 0,
+        nombrePersona: '',
+        apellidoPersona: '',
+        telefonoPersona: '',
+        ciPersona: '',
+        statusPersona: '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        updatedBy: null,
+        createdBy: null,
+      },
+      statusUser: '',
+      createdBy: null,
+    };
+    this.formElectronica = this.fb.group({
+      cdc: ['', Validators.required],
+      rucEmisor: ['', Validators.required],
+      razonSocialEmisor: ['', Validators.required],
+      timbradoNro: ['', Validators.required],
+      fechaInicioVig: ['', Validators.required],
+      rucReceptor: ['', Validators.required],
+      razonSocialReceptor: ['', Validators.required],
+      nroFactura: ['', Validators.required],
+      fechaEmision: ['', Validators.required],
+      condicionVenta: ['', Validators.required],
+      montoTotal: ['', Validators.required],
+      montoIva10: ['', Validators.required],
+      montoIva5: ['', Validators.required],
+      montoExenta: ['', Validators.required],
+      montoTotalIVA: ['', Validators.required],
+      tipoFactura: ['', Validators.required],
+    });
+    this.formVirtual = this.fb.group({
+      codigoControl: ['', Validators.required],
+      rucEmisor: ['', Validators.required],
+      razonSocialEmisor: ['', Validators.required],
+      timbradoNro: ['', Validators.required],
+      fechaInicioVig: ['', Validators.required],
+      rucReceptor: ['', Validators.required],
+      razonSocialReceptor: ['', Validators.required],
+      nroFactura: ['', Validators.required],
+      fechaEmision: ['', Validators.required],
+      condicionVenta: ['', Validators.required],
+      montoTotal: ['', Validators.required],
+      montoIva10: ['', Validators.required],
+      montoIva5: ['', Validators.required],
+      montoExenta: ['', Validators.required],
+      montoTotalIVA: ['', Validators.required],
+      tipoFactura: ['', Validators.required],
+    });
+    this.formFactura = this.fb.group({
+      rucEmisor: [this.rucEmisor, Validators.required],
+      razonSocialEmisor: [this.razonSocialEmisor, Validators.required],
+      timbradoNro: ['', Validators.required],
+      fechaInicioVig: ['', Validators.required],
+      fechaFinVig: ['', Validators.required],
+      rucReceptor: ['', Validators.required],
+      razonSocialReceptor: ['', Validators.required],
+      nroFactura: ['', Validators.required],
+      fechaEmision: ['', Validators.required],
+      condicionVenta: ['', Validators.required],
+      montoTotal: ['', Validators.required],
+      montoIva10: ['', Validators.required],
+      montoIva5: ['', Validators.required],
+      montoExenta: ['', Validators.required],
+      montoTotalIVA: ['', Validators.required],
+      tipoFactura: ['', Validators.required],
+    });
+  }
 
   ngOnInit() {
     this.scaneoRealizado = false;
     this.esQr = false;
+    this.formVirtual = new FormGroup({
+      codigoControl: new FormControl(''),
+      rucEmisor: new FormControl(''),
+      razonSocialEmisor: new FormControl(''),
+      timbradoNro: new FormControl(''),
+      fechaInicioVig: new FormControl(''),
+      fechaFinVig: new FormControl(''),
+      rucReceptor: new FormControl(''),
+      razonSocialReceptor: new FormControl(''),
+      nroFactura: new FormControl(''),
+      fechaEmision: new FormControl(''),
+      condicionVenta: new FormControl(''),
+      montoTotal: new FormControl(''),
+      montoIva10: new FormControl(''),
+      montoIva5: new FormControl(''),
+      montoExenta: new FormControl(''),
+      montoTotalIVA: new FormControl(''),
+      tipoFactura: new FormControl(''),
+    });
+    this._userService.getUserById(this.idUser).subscribe((user) => {
+      this.user = user.objeto;
+      console.log('El usuario es: ', this.user);
+    });
   }
 
   ngAfterViewInit(): void {
     // this.action.isReady.subscribe((res: any) => {
     //   this.handle(this.action, 'start');
     // });
+  }
+
+  convertirFecha(fecha: string, condicion: string): string {
+    return this.fechaPipe.transform(fecha, condicion);
   }
 
   // openModal() {
@@ -171,11 +318,14 @@ export class ScannComponent implements AfterViewInit, OnInit {
     } else if (this.datosQrVirtual(text)) {
       this.facturaVirtual = true;
       console.log('Es un QR valido de Factura Virtual');
-      this.codigoControl = this.facturaVirtualQr[0].toUpperCase();
-      this.timbradoNro = this.facturaVirtualQr[1];
-      this.nroFactura = this.facturaVirtualQr[2];
-      this.rucEmisor = this.facturaVirtualQr[3];
-      this.montoTotal = this.facturaVirtualQr[4];
+      this.formVirtual.get('tipoFactura')!.setValue('Factura Virtual');
+      this.formVirtual
+        .get('codigoControl')!
+        .setValue(this.facturaVirtualQr[0].toUpperCase());
+      this.formVirtual.get('timbradoNro')!.setValue(this.facturaVirtualQr[1]);
+      this.formVirtual.get('nroFactura')!.setValue(this.facturaVirtualQr[2]);
+      this.formVirtual.get('rucEmisor')!.setValue(this.facturaVirtualQr[3]);
+      this.formVirtual.get('montoTotal')!.setValue(this.facturaVirtualQr[4]);
       console.log(text);
 
       return true;
@@ -195,7 +345,7 @@ export class ScannComponent implements AfterViewInit, OnInit {
     this.facturaVirtual = false;
     this.otrosTiposFacturas = false;
     this.facturaElectronica = true;
-    this.CDC = this.busquedaDatosQr(param, 'Id=', null, null, null, null, '&');
+    this.cdc = this.busquedaDatosQr(param, 'Id=', null, null, null, null, '&');
     this.rucReceptor = this.busquedaDatosQr(
       param,
       'dRucRec=',
@@ -243,6 +393,8 @@ export class ScannComponent implements AfterViewInit, OnInit {
     key5: string | null,
     end: string
   ): string {
+    console.log('llego aqui a buscar datos qr');
+
     if (key2 != null && key3 === null && key4 === null && key5 === null) {
       return (
         this.extractData(text, key1, end) || this.extractData(text, key2, end)
@@ -356,8 +508,19 @@ export class ScannComponent implements AfterViewInit, OnInit {
       this.montoExenta = '';
       this.condicionVenta = '';
       this.extractValueIVA(text);
+
       this.fechaEmision = this.extractDate(text, 'EMISION:');
       this.fechaInicioVig = this.extractDate(text, 'INICIO DE VIGENCIA');
+
+      this.formVirtual
+        .get('razonSocialReceptor')!
+        .setValue(this.razonSocialReceptor);
+      this.formVirtual.get('rucReceptor')!.setValue(this.rucReceptor);
+      this.formVirtual.get('rucEmisor')!.setValue(this.rucEmisor);
+
+      this.formVirtual.get('fechaEmision')!.setValue(this.fechaEmision);
+      this.formVirtual.get('fechaInicioVig')!.setValue(this.fechaInicioVig);
+
       // this.fechaFinVig = this.extractDate(text, 'FIN DE VIGENCIA');
     } else {
     }
@@ -690,5 +853,53 @@ export class ScannComponent implements AfterViewInit, OnInit {
     const limitChar = ',';
     const extractedData = this.extractDataVirtual(text, prefix, limitChar);
     console.log(extractedData); // Debería imprimir "JUANITO SA"
+  }
+
+  guardarFactura() {
+    console.log(this.formVirtual.value);
+
+    let factura: Factura = {
+      idFactura: null,
+
+      tipoFactura: this.formVirtual.value.tipoFactura,
+      timbradoFactura: this.formVirtual.value.timbradoNro,
+      cdcFactura: null,
+      codigoControlFactura: this.formVirtual.value.codigoControl,
+      numeroFactura: this.formVirtual.value.nroFactura,
+      rucEmisorFactura: this.formVirtual.value.rucEmisor,
+      razonSocialEmisorFactura: this.formVirtual.value.razonSocialEmisor,
+      rucReceptorFactura: this.formVirtual.value.rucReceptor,
+      razonSocialReceptorFactura: this.formVirtual.value.razonSocialReceptor,
+      condicionVentaFactura: this.formVirtual.value.condicionVenta,
+      statusFactura: 'ACTIVO',
+      fechaInicioVigenciaFactura: this.convertirFecha(
+        this.formVirtual.value.fechaInicioVig,
+        "yyyy-MM-dd'T'HH:mm:ss.SSS"
+      ),
+      fechaFinVigenciaFactura: null,
+      fechaEmisionFactura: this.convertirFecha(
+        this.formVirtual.value.fechaEmision,
+        "yyyy-MM-dd'T'HH:mm:ss.SSS"
+      ),
+
+      montoTotalFactura: this.formVirtual.value.montoTotal,
+      montoTotalIvaFactura: this.formVirtual.value.montoTotalIVA,
+      monto5Factura: this.formVirtual.value.montoIva5,
+      monto10Factura: this.formVirtual.value.montoIva10,
+      excentaFactura: this.formVirtual.value.montoExenta,
+
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+
+      updatedBy: this.user,
+      createdBy: this.user,
+    };
+
+    console.log('La factura...', factura);
+
+    this._facturaService.setFactura(factura).subscribe((resp) => {
+      console.log('La factura guardada...', resp);
+      console.log('Factura guardada con exito...!!!');
+    });
   }
 }

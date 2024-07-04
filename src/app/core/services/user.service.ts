@@ -7,15 +7,15 @@ import { User } from '../model/User';
   providedIn: 'root',
 })
 export class UserService {
-  private apiUser: string = 'http://localhost:8088/api/v1/';
+  private api: string = 'http://localhost:8088/api/v1/';
 
   constructor(private http: HttpClient) {}
 
   getAllUsers(): Observable<any> {
-    return this.http.get<any>(this.apiUser + 'users');
+    return this.http.get<any>(this.api + 'users');
   }
 
-  getUser(id: number): Observable<User> {
-    return this.http.get<User>(this.apiUser + 'user/' + id);
+  getUserById(id: number): Observable<any> {
+    return this.http.get<any>(this.api + 'user/' + id);
   }
 }

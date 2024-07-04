@@ -5,9 +5,9 @@ export class Rol {
   nombreRol: string;
   statusRol: string;
   createdAt: Date;
-  createdBy: User;
+  createdBy: User | null;
   updatedAt: Date;
-  updatedBy: User;
+  updatedBy: User | null;
 
   constructor(
     idRol: number,

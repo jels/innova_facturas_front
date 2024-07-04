@@ -3,56 +3,50 @@
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
-
-        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-            <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
-                <a href="/"
-                    class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-                    <span class="fs-4">Inicio</span>
-                </a>
-                <hr>
-                <ul class="nav nav-pills flex-column mb-auto">
-                    <li class="nav-item">
-                        <a href="/dashboard" class="nav-link link-body-emphasis">
-                            <i class="fa fa-home" aria-hidden="true" style="padding-right: 5px;"></i>
-                            Home
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/dashboard" class="nav-link link-body-emphasis">
-                            <i class="fa fa-tachometer" aria-hidden="true" style="padding-right: 5px;"></i>
-                            Estadisticas
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/dashboard/scanning" class="nav-link link-body-emphasis">
-                            <i class="fa fa-qrcode" aria-hidden="true" style="padding-right: 5px;"></i>
-                            Escanear Facturas
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/dashboard" class="nav-link link-body-emphasis">
-                            <i class="fa fa-area-chart" aria-hidden="true" style="padding-right: 5px;"></i>
-                            Reportes
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/dashboard/users" class="nav-link link-body-emphasis">
-                            <i class="fa fa-users" aria-hidden="true" style="padding-right: 5px;"></i>
-                            Usuarios
-                        </a>
-                    </li>
-                </ul>
-                <hr>
-            </div>
-        </nav>
         <!-- Main content -->
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+        <main role="main">
             <router-outlet />
         </main>
     </div>
 </div>
 
 <!-- Footer -->
+
+
+<button mat-fab [matMenuTriggerFor]="menu" class="btn-flotante">
+    <mat-icon>menu</mat-icon>
+</button>
+<mat-menu #menu="matMenu">
+    <button mat-menu-item>
+        <a href="/dashboard" class="nav-link link-body-emphasis">
+            <span>Inicio</span>
+        </a>
+        <mat-icon>home</mat-icon>
+    </button>
+    <button mat-menu-item>
+        <a href="/dashboard/scanning" class="nav-link link-body-emphasis">
+            <span>Escanear Facturas</span>
+        </a>
+        <mat-icon>flip</mat-icon>
+    </button>
+    <button mat-menu-item>
+        <a href="/dashboard" class="nav-link link-body-emphasis">
+            <span>Estadisticas</span>
+        </a>
+        <mat-icon>analytics</mat-icon>
+    </button>
+    <button mat-menu-item>
+        <a href="/dashboard" class="nav-link link-body-emphasis">
+            <span>Reportes</span>
+        </a>
+        <mat-icon>bar_chart</mat-icon>
+
+    </button>
+    <button mat-menu-item>
+        <a href="/dashboard/users" class="nav-link link-body-emphasis">
+            <span>Usuarios</span>
+        </a>
+        <mat-icon>manage_accounts</mat-icon>
+    </button>
+</mat-menu>
 <app-footer />

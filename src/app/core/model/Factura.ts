@@ -1,35 +1,34 @@
 import { User } from './User';
 
 export class Factura {
-  idFactura: number;
+  idFactura: number | null;
 
   tipoFactura: string;
   timbradoFactura: string;
-  cdcFactura: string;
-  codigoControlFactura: string;
+  cdcFactura: string | null;
+  codigoControlFactura: string | null;
   numeroFactura: string;
   rucEmisorFactura: string;
   razonSocialEmisorFactura: string;
   rucReceptorFactura: string;
   razonSocialReceptorFactura: string;
   condicionVentaFactura: string;
-  statusFactura: string;
-
-  fechaInicioVigenciaFactura: Date;
-  fechaFinVigenciaFactura: Date;
-  fechaEmisionFactura: Date;
+  statusFactura: string | null;
+  fechaInicioVigenciaFactura: string;
+  fechaFinVigenciaFactura: string | null;
+  fechaEmisionFactura: string;
 
   montoTotalFactura: number;
-  montoTotalIvaFactura: number;
-  monto5Factura: number;
-  monto10Factura: number;
-  excentaFactura: number;
+  montoTotalIvaFactura: number | null;
+  monto5Factura: number | null;
+  monto10Factura: number | null;
+  excentaFactura: number | null;
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 
-  updatedBy: User;
-  createdBy: User;
+  updatedBy: User | null;
+  createdBy: User | null;
 
   constructor(
     idFactura: number,
@@ -44,16 +43,16 @@ export class Factura {
     razonSocialReceptorFactura: string,
     condicionVentaFactura: string,
     statusFactura: string,
-    fechaInicioVigenciaFactura: Date,
-    fechaFinVigenciaFactura: Date,
-    fechaEmisionFactura: Date,
+    fechaInicioVigenciaFactura: string,
+    fechaFinVigenciaFactura: string,
+    fechaEmisionFactura: string,
     montoTotalFactura: number,
     montoTotalIvaFactura: number,
     monto5Factura: number,
     monto10Factura: number,
     excentaFactura: number,
-    createdAt: Date,
-    updatedAt: Date,
+    createdAt: string,
+    updatedAt: string,
     updatedBy: User,
     createdBy: User
   ) {

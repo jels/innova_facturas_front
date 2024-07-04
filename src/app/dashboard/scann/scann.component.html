@@ -105,8 +105,9 @@
 
 
 <div class="container text-center">
-    <form class="form-scanner">
-        @if (facturaElectronica) {
+    @if (facturaElectronica) {
+    <form class="form-scanner" [formGroup]="formElectronica" (ngSubmit)="guardarFactura()">
+
         <div class="row">
             <!-- Cabecera de la factura -->
             <div class="col col-8 align-self-center">
@@ -115,28 +116,32 @@
                     <div class="col-lg-12">
                         <mat-form-field class="form-scanner-full-width">
                             <mat-label>Tipo Factura:</mat-label>
-                            <input matInput placeholder="Ej: Factura Electornica" value="Factura Electrónica">
+                            <input formControlName="tipoFactura" matInput placeholder="Ej: Factura Electornica"
+                                value="Factura Electrónica">
                         </mat-form-field>
                     </div>
                     <!-- CDC de la factura si es que existe... -->
                     <div class="col-lg-12">
                         <mat-form-field class="form-scanner-full-width">
                             <mat-label>CDC: </mat-label>
-                            <input matInput placeholder="Ej: Factura Electornica" value="{{CDC}}">
+                            <input formControlName="cdc" matInput placeholder="Ej: Factura Electornica"
+                                value="{{ cdc }}">
                         </mat-form-field>
                     </div>
                     <!-- Ruc del Emisor de la factura... -->
                     <div class="col col-lg-12">
                         <mat-form-field class="form-scanner-full-width">
                             <mat-label>Ruc Emisor:</mat-label>
-                            <input matInput placeholder="Ej: 80001234-0" value="{{rucEmisor}}">
+                            <input formControlName="rucEmisor" matInput placeholder="Ej: 80001234-0"
+                                value="{{ rucEmisor }}">
                         </mat-form-field>
                     </div>
                     <!-- Razon Social del Emisor de la factura... -->
                     <div class="col col-lg-12">
                         <mat-form-field class="form-scanner-full-width">
                             <mat-label>Razón Social:</mat-label>
-                            <input matInput placeholder="Ej: Morado SA" value="{{razonSocialEmisor}}">
+                            <input formControlName="razonSocialEmisor" matInput placeholder="Ej: Morado SA"
+                                value="{{ razonSocialEmisor }}">
                         </mat-form-field>
                     </div>
                 </div>
@@ -147,28 +152,25 @@
                 <div class="col-lg-12">
                     <mat-form-field class="form-scanner-full-width">
                         <mat-label>Timbrado Nro:</mat-label>
-                        <input matInput placeholder="Ej: 12345678" value="{{timbradoNro}}">
+                        <input formControlName="timbradoNro" matInput placeholder="Ej: 12345678"
+                            value="{{ timbradoNro }}">
                     </mat-form-field>
                 </div>
                 <!-- Fecha Inicio Vigencia de la factura... -->
                 <div class="col-lg-12">
                     <mat-form-field class="form-scanner-full-width">
                         <mat-label>Fecha Inicio Vigencia:</mat-label>
-                        <input matInput placeholder="Ej: 01/01/2024" value="{{fechaInicioVig}}">
+                        <input formControlName="fechaInicioVig" matInput placeholder="Ej: 01/01/2024"
+                            value="{{ fechaInicioVig }}">
                     </mat-form-field>
                 </div>
-                <!-- Fecha Fin Vigencia de la factura... -->
-                <div class="col-lg-12">
-                    <mat-form-field class="form-scanner-full-width">
-                        <mat-label>Fecha Fin Vigencia:</mat-label>
-                        <input matInput placeholder="Ej: 01/01/2030" value="{{fechaFinVig}}">
-                    </mat-form-field>
-                </div>
+
                 <!-- Numero de la Factura... -->
                 <div class="col-lg-12">
                     <mat-form-field class="form-scanner-full-width">
                         <mat-label>Numero Factura:</mat-label>
-                        <input matInput placeholder="Ej: 001-001-0000001" value="{{nroFactura}}">
+                        <input formControlName="nroFactura" matInput placeholder="Ej: 001-001-0000001"
+                            value="{{ nroFactura }}">
                     </mat-form-field>
                 </div>
             </div>
@@ -180,14 +182,16 @@
                 <!-- Fecha de Emisión de la factura... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Fecha de Emisión:</mat-label>
-                    <input matInput placeholder="Ej: 01/01/2024" value="{{fechaEmision}}">
+                    <input formControlName="fechaEmision" matInput placeholder="Ej: 01/01/2024"
+                        value="{{fechaEmision}}">
                 </mat-form-field>
             </div>
             <div class="col col-4">
                 <!-- Condición de Venta de la factura... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Condición de Venta:</mat-label>
-                    <input matInput placeholder="Ej: Contado" value="{{condicionVenta}}">
+                    <input formControlName="condicionVenta" matInput placeholder="Ej: Contado"
+                        value="{{condicionVenta}}">
                 </mat-form-field>
             </div>
         </div>
@@ -196,7 +200,7 @@
                 <!-- Ruc del Receptor de la factura... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Ruc Receptor:</mat-label>
-                    <input matInput placeholder="Ej: 80001234-0" value="{{rucReceptor}}">
+                    <input formControlName="rucReceptor" matInput placeholder="Ej: 80001234-0" value="{{rucReceptor}}">
                 </mat-form-field>
             </div>
         </div>
@@ -205,7 +209,8 @@
                 <!-- Razón Social Receptor de la factura... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Razón Social Receptor:</mat-label>
-                    <input matInput placeholder="Ej: Morado SA" value="{{razonSocialReceptor}}">
+                    <input formControlName="razonSocialReceptor" matInput placeholder="Ej: Morado SA"
+                        value="{{razonSocialReceptor}}">
                 </mat-form-field>
             </div>
         </div>
@@ -214,21 +219,21 @@
             <div class="col col-2"><!-- Excenta de la factura si es que existe... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Excenta:</mat-label>
-                    <input matInput placeholder="Ej: 10.000 Gs" value="{{montoExenta}}">
+                    <input formControlName="montoExenta" matInput placeholder="Ej: 10.000 Gs" value="{{montoExenta}}">
                 </mat-form-field>
             </div>
             <div class="col col-2">
                 <!-- IVA 10% de la factura si es que existe... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>IVA 5%:</mat-label>
-                    <input matInput placeholder="Ej: 5.000 Gs" value="{{montoIva5}}">
+                    <input formControlName="montoIva5" matInput placeholder="Ej: 5.000 Gs" value="{{montoIva5}}">
                 </mat-form-field>
             </div>
             <div class="col col-2">
                 <!-- IVA 10% de la factura si es que existe... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>IVA 10%:</mat-label>
-                    <input matInput placeholder="Ej: 10.000 Gs" value="{{montoIva10}}">
+                    <input formControlName="montoIva10" matInput placeholder="Ej: 10.000 Gs" value="{{montoIva10}}">
                 </mat-form-field>
             </div>
             <div class="col col-2">
@@ -236,7 +241,8 @@
                 <div class="col-lg-12">
                     <mat-form-field class="form-scanner-full-width">
                         <mat-label>Total IVA:</mat-label>
-                        <input matInput placeholder="Ej: 12.000 Gs" value="{{montoTotalIVA}}">
+                        <input formControlName="montoTotalIVA" matInput placeholder="Ej: 12.000 Gs"
+                            value="{{montoTotalIVA}}">
                     </mat-form-field>
                 </div>
             </div>
@@ -244,14 +250,32 @@
                 <!-- Monto Total de la factura... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Monto Total:</mat-label>
-                    <input matInput placeholder="Ej: 1.000.000 Gs" value="{{montoTotal}}">
+                    <input formControlName="montoTotal" matInput placeholder="Ej: 1.000.000 Gs" value="{{montoTotal}}">
                 </mat-form-field>
             </div>
         </div>
 
-        }
+        <div [hidden]="!scaneoRealizado && !facturaElectronica">
+            <div class="container">
+                <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col-6 d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button class="btn btn-success" tabindex="-1" role="button" aria-disabled="true"
+                            [disabled]="!formElectronica.valid">
+                            <span>Guardar</span>
+                        </button>
+                        <button class="btn btn-danger" tabindex="-1" role="button" aria-disabled="true"
+                            (click)="clean()">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+    </form>
+    }
 
-        @if (facturaVirtual) {
+    @if (facturaVirtual) {
+    <form class="form-scanner" [formGroup]="formVirtual" (ngSubmit)="guardarFactura()">
 
         <div class="row">
             <!-- Cabecera de la factura -->
@@ -261,91 +285,90 @@
                     <div class="col-lg-12">
                         <mat-form-field class="form-scanner-full-width">
                             <mat-label>Tipo Factura:</mat-label>
-                            <input matInput placeholder="Ej: Factura Electornica" value="Factura Virtual">
+                            <input formControlName="tipoFactura" matInput placeholder="Ej: Factura Virtual"
+                                value="Factura Virtual">
                         </mat-form-field>
                     </div>
-                    <!-- CDC de la factura si es que existe... -->
-                    <div class="col-lg-12">
+                    <div class="col-lg-12"> <!-- Codigo Control -->
                         <mat-form-field class="form-scanner-full-width">
                             <mat-label>Codigo Control: </mat-label>
-                            <input matInput placeholder="Ej: Factura Electornica" value="{{codigoControl}}">
+                            <input matInput formControlName="codigoControl" pattern="[A-Za-z0-9]{8}"
+                                placeholder="Ej: 930508EE" required="true">
                         </mat-form-field>
                     </div>
-                    <!-- Ruc del Emisor de la factura... -->
-                    <div class="col col-lg-12">
+                    <div class="col col-lg-12"> <!-- Ruc del Emisor de la factura... -->
                         <mat-form-field class="form-scanner-full-width">
                             <mat-label>Ruc Emisor:</mat-label>
-                            <input matInput placeholder="Ej: 80001234-0" value="{{rucEmisor}}">
+                            <input matInput formControlName="rucEmisor" pattern="\d{6,9}-\d"
+                                placeholder="Ej: 80001234-0" required="true">
                         </mat-form-field>
                     </div>
-                    <!-- Razon Social del Emisor de la factura... -->
-                    <div class="col col-lg-12">
+                    <div class="col col-lg-12"><!-- Razon Social del Emisor de la factura... -->
                         <mat-form-field class="form-scanner-full-width">
                             <mat-label>Razón Social:</mat-label>
-                            <input matInput placeholder="Ej: Morado SA" value="{{razonSocialEmisor}}">
+                            <input matInput formControlName="razonSocialEmisor" placeholder="Ej: Morado SA"
+                                required="true">
                         </mat-form-field>
                     </div>
                 </div>
             </div>
             <!-- Cabecera lateral derecha -->
             <div class="col col-4 align-self-center">
-                <!-- Timbrado numero de la factura... -->
-                <div class="col-lg-12">
+
+                <div class="col-lg-12"><!-- Timbrado numero de la factura... -->
                     <mat-form-field class="form-scanner-full-width">
                         <mat-label>Timbrado Nro:</mat-label>
-                        <input matInput placeholder="Ej: 12345678" value="{{timbradoNro}}">
+                        <input matInput formControlName="timbradoNro" pattern="[0-9]{7,10}" placeholder="Ej: 12345678"
+                            required="true">
                     </mat-form-field>
                 </div>
-                <!-- Fecha Inicio Vigencia de la factura... -->
-                <div class="col-lg-12">
+                <div class="col-lg-12"><!-- Fecha Inicio Vigencia de la factura... -->
                     <mat-form-field class="form-scanner-full-width">
                         <mat-label>Fecha Inicio Vigencia:</mat-label>
-                        <input matInput placeholder="Ej: 01/01/2024" value="{{fechaInicioVig}}">
+                        <input matInput formControlName="fechaInicioVig" pattern="\d{2}/\d{2}/\d{4}"
+                            placeholder="Ej: 01/01/2024" required="true">
                     </mat-form-field>
                 </div>
-
-                <!-- Numero de la Factura... -->
-                <div class="col-lg-12">
+                <div class="col-lg-12"><!-- Numero de la Factura... -->
                     <mat-form-field class="form-scanner-full-width">
                         <mat-label>Numero Factura:</mat-label>
-                        <input matInput placeholder="Ej: 001-001-0000001" value="{{nroFactura}}">
+                        <input matInput formControlName="nroFactura" pattern="\d{3}-\d{3}-\d{7}"
+                            placeholder="Ej: 001-001-0000001" required="true">
                     </mat-form-field>
                 </div>
             </div>
-
         </div>
         <!-- Cuerpo de la factura -->
         <div class="row">
-            <div class="col col-8">
-                <!-- Fecha de Emisión de la factura... -->
+            <div class="col col-8"><!-- Fecha de Emisión de la factura... -->
+
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Fecha de Emisión:</mat-label>
-                    <input matInput placeholder="Ej: 01/01/2024" value="{{fechaEmision}}">
+                    <input matInput formControlName="fechaEmision" pattern="\d{2}/\d{2}/\d{4}"
+                        placeholder="Ej: 01/01/2024" required="true">
                 </mat-form-field>
             </div>
-            <div class="col col-4">
-                <!-- Condición de Venta de la factura... -->
+            <div class="col col-4"><!-- Condición de Venta de la factura... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Condición de Venta:</mat-label>
-                    <input matInput placeholder="Ej: Contado" value="{{condicionVenta}}">
+                    <input matInput formControlName="condicionVenta" placeholder="Ej: Contado" required="true">
                 </mat-form-field>
             </div>
         </div>
         <div class="row">
-            <div class="col col-12">
-                <!-- Ruc del Receptor de la factura... -->
+            <div class="col col-12"> <!-- Ruc del Receptor de la factura... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Ruc Receptor:</mat-label>
-                    <input matInput placeholder="Ej: 80001234-0" value="{{rucReceptor}}">
+                    <input matInput formControlName="rucReceptor" pattern="\d{6,9}-\d" placeholder="Ej: 80001234-0"
+                        required="true">
                 </mat-form-field>
             </div>
         </div>
         <div class="row">
-            <div class="col col-12">
-                <!-- Razón Social Receptor de la factura... -->
+            <div class="col col-12"> <!-- Razón Social Receptor de la factura... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Razón Social Receptor:</mat-label>
-                    <input matInput placeholder="Ej: Morado SA" value="{{razonSocialReceptor}}">
+                    <input matInput formControlName="razonSocialReceptor" placeholder="Ej: Morado SA" required="true">
                 </mat-form-field>
             </div>
         </div>
@@ -354,43 +377,66 @@
             <div class="col col-2"><!-- Excenta de la factura si es que existe... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Excenta:</mat-label>
-                    <input matInput placeholder="Ej: 10.000 Gs" value="{{montoExenta}}">
+                    <input matInput formControlName="montoExenta" pattern="\d+" placeholder="Ej: 10.000 Gs"
+                        required="true">
                 </mat-form-field>
             </div>
-            <div class="col col-2">
-                <!-- IVA 10% de la factura si es que existe... -->
+            <div class="col col-2"><!-- IVA 10% de la factura si es que existe... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>IVA 5%:</mat-label>
-                    <input matInput placeholder="Ej: 5.000 Gs" value="{{montoIva5}}">
+                    <input matInput formControlName="montoIva5" pattern="\d+" placeholder="Ej: 5.000 Gs"
+                        required="true">
                 </mat-form-field>
             </div>
-            <div class="col col-2">
-                <!-- IVA 10% de la factura si es que existe... -->
+            <div class="col col-2"><!-- IVA 10% de la factura si es que existe... -->
+
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>IVA 10%:</mat-label>
-                    <input matInput placeholder="Ej: 10.000 Gs" value="{{montoIva10}}">
+                    <input matInput formControlName="montoIva10" pattern="\d+" placeholder="Ej: 10.000 Gs"
+                        required="true">
                 </mat-form-field>
             </div>
             <div class="col col-2">
-                <!-- Total IVA de la factura... -->
-                <div class="col-lg-12">
+                <div class="col-lg-12"><!-- Total IVA de la factura... -->
                     <mat-form-field class="form-scanner-full-width">
                         <mat-label>Total IVA:</mat-label>
-                        <input matInput placeholder="Ej: 12.000 Gs" value="{{montoTotalIVA}}">
+                        <input matInput formControlName="montoTotalIVA" pattern="\d+" placeholder="Ej: 12.000 Gs"
+                            required="true">
                     </mat-form-field>
                 </div>
             </div>
-            <div class="col col-4">
-                <!-- Monto Total de la factura... -->
+            <div class="col col-4"><!-- Monto Total de la factura... -->
                 <mat-form-field class="form-scanner-full-width">
                     <mat-label>Monto Total:</mat-label>
-                    <input matInput placeholder="Ej: 1.000.000 Gs" value="{{montoTotal}}">
+                    <input matInput formControlName="montoTotal" pattern="\d+" placeholder="Ej: 1.000.000 Gs"
+                        required="true">
                 </mat-form-field>
             </div>
         </div>
-        }
+        <div [hidden]="!scaneoRealizado">
+            <div class="container">
+                <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col-6 d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button class="btn btn-success" tabindex="-1" role="button" aria-disabled="true"
+                            [disabled]="!formVirtual.valid">
+                            <span>Guardar</span>
+                        </button>
+                        <button class="btn btn-danger" tabindex="-1" role="button" aria-disabled="true"
+                            (click)="clean()">
+                            <span>Cancelar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+    </form>
 
-        @if (otrosTiposFacturas) {
+    }
+
+    @if (otrosTiposFacturas) {
+    <form class="form-scanner" [formGroup]="formFactura" (ngSubmit)="guardarFactura()">
 
 
         <div class="row">
@@ -528,21 +574,26 @@
             </div>
         </div>
 
-        }
-        <div [hidden]="!scaneoRealizado">
+        <div [hidden]="!scaneoRealizado && !otrosTiposFacturas">
             <div class="container">
                 <div class="row">
                     <div class="col-6"></div>
                     <div class="col-6 d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="/dashboard" class="btn btn-success" tabindex="-1" role="button"
-                            aria-disabled="true">Guardar</a>
-                        <a href="/dashboard" class="btn btn-danger" tabindex="-1" role="button" aria-disabled="true"
-                            (click)="clean()">Cancelar</a>
+                        <button class="btn btn-success" tabindex="-1" role="button" aria-disabled="true"
+                            [disabled]="!formFactura.valid">
+                            <span>Guardar</span>
+                        </button>
+                        <button class="btn btn-danger" tabindex="-1" role="button" aria-disabled="true"
+                            (click)="clean()">Cancelar</button>
                     </div>
                 </div>
             </div>
         </div>
         <br>
-
     </form>
+    }
+
+
+
+
 </div>
