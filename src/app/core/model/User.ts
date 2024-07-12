@@ -3,6 +3,7 @@ import { Rol } from './Rol';
 
 export class User {
   idUser: number | null;
+  idEmpresa: number;
   rol: Rol;
   username: string;
   password: string;
@@ -11,10 +12,11 @@ export class User {
   updatedAt: Date;
   persona: Persona;
   statusUser: string;
-  createdBy: User | null;
+  createdBy: number;
 
   constructor(
     idUser: number,
+    idEmpresa: number,
     rol: Rol,
     username: string,
     password: string,
@@ -23,9 +25,10 @@ export class User {
     updatedAt: Date,
     persona: Persona,
     statusUser: string,
-    createdBy: User
+    createdBy: number
   ) {
     this.idUser = idUser;
+    this.idEmpresa = idEmpresa;
     this.rol = rol;
     this.username = username;
     this.password = password;

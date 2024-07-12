@@ -5,18 +5,18 @@ export class Rol {
   nombreRol: string;
   statusRol: string;
   createdAt: Date;
-  createdBy: User | null;
+  createdBy: number;
   updatedAt: Date;
-  updatedBy: User | null;
+  updatedBy: number;
 
   constructor(
     idRol: number,
     nombreRol: string,
     statusRol: string,
     createdAt: Date,
-    createdBy: User,
+    createdBy: number,
     updatedAt: Date,
-    updatedBy: User
+    updatedBy: number
   ) {
     this.idRol = idRol;
     this.nombreRol = nombreRol;

@@ -15,11 +15,22 @@ export class FacturaService {
     return this.http.get<any>(this.api + 'facturas');
   }
 
-  getFactura(id: number): Observable<Factura> {
-    return this.http.get<Factura>(this.api + 'factura/' + id);
+  getFactura(id: number): Observable<any> {
+    return this.http.get<any>(this.api + 'factura/' + id);
   }
 
-  setFactura(factura: Factura): Observable<Factura> {
-    return this.http.post<Factura>(this.api + 'factura', factura);
+  setFactura(factura: Factura): Observable<any> {
+    return this.http.post<any>(this.api + 'factura', factura);
+  }
+
+  updatedFactura(factura: Factura, id: number): Observable<any> {
+    console.log('la factura es la siguiente...', factura, id);
+    return this.http.put<any>(this.api + 'factura/' + id, factura);
+  }
+
+  getFacturasFiltradas(anho: number, mes: number, id: number): Observable<any> {
+    return this.http.get<any>(
+      this.api + 'facturas/' + id + '&' + anho + '&' + mes
+    );
   }
 }

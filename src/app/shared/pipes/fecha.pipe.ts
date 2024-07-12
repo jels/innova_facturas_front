@@ -1,15 +1,12 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DatePipe, formatDate } from '@angular/common';
+import { formatDate } from '@angular/common';
 
 @Pipe({
   name: 'fecha',
   standalone: true,
 })
 export class FechaPipe implements PipeTransform {
-  transform(
-    value: string,
-    format: string = "yyyy-MM-dd'T'HH:mm:ss.SSS"
-  ): string {
+  transform(value: string, format: string): string {
     if (!value) {
       return '';
     }

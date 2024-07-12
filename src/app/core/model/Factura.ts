@@ -1,8 +1,10 @@
+import { Empresa } from './Empresa';
 import { User } from './User';
 
 export class Factura {
   idFactura: number | null;
 
+  empresa: Empresa;
   tipoFactura: string;
   timbradoFactura: string;
   cdcFactura: string | null;
@@ -14,24 +16,25 @@ export class Factura {
   razonSocialReceptorFactura: string;
   condicionVentaFactura: string;
   statusFactura: string | null;
-  fechaInicioVigenciaFactura: string;
-  fechaFinVigenciaFactura: string | null;
-  fechaEmisionFactura: string;
+  fechaInicioVigenciaFactura: Date;
+  fechaFinVigenciaFactura: Date | null;
+  fechaEmisionFactura: Date;
 
   montoTotalFactura: number;
-  montoTotalIvaFactura: number | null;
-  monto5Factura: number | null;
-  monto10Factura: number | null;
-  excentaFactura: number | null;
+  montoTotalIvaFactura: number;
+  monto5Factura: number;
+  monto10Factura: number;
+  excentaFactura: number;
 
   createdAt: string;
   updatedAt: string;
 
-  updatedBy: User | null;
-  createdBy: User | null;
+  updatedBy: User;
+  createdBy: User;
 
   constructor(
     idFactura: number,
+    empresa: Empresa,
     tipoFactura: string,
     timbradoFactura: string,
     cdcFactura: string,
@@ -43,9 +46,9 @@ export class Factura {
     razonSocialReceptorFactura: string,
     condicionVentaFactura: string,
     statusFactura: string,
-    fechaInicioVigenciaFactura: string,
-    fechaFinVigenciaFactura: string,
-    fechaEmisionFactura: string,
+    fechaInicioVigenciaFactura: Date,
+    fechaFinVigenciaFactura: Date,
+    fechaEmisionFactura: Date,
     montoTotalFactura: number,
     montoTotalIvaFactura: number,
     monto5Factura: number,
@@ -57,6 +60,7 @@ export class Factura {
     createdBy: User
   ) {
     this.idFactura = idFactura;
+    this.empresa = empresa;
     this.tipoFactura = tipoFactura;
     this.timbradoFactura = timbradoFactura;
     this.cdcFactura = cdcFactura;

@@ -1,5 +1,31 @@
-<div class="container text-center">
-    <h3> Escaneador de Facturas Innova </h3>
+<div class="container text-center" style="padding-top: 1%;">
+    <h4 style="color: white;"> Escaneador de Facturas Innova </h4>
+</div>
+<div class="container">
+    <form [formGroup]="form">
+        <div class="container-fluid text-center">
+            <div class="row justify-content-md-center">
+                <h6 class="text-center" style="color: white;">
+                    Elija el cliente para escanear las facturas
+                </h6>
+                <div class="col col-6">
+                    <mat-form-field class="form-scanner-full-width">
+                        <mat-label>Seleccione el Cliente: </mat-label>
+                        <mat-select [formControl]="clientesControl" name="clientes">
+                            <mat-option>--</mat-option>
+                            @for (cliente of clientes; track cliente) {
+                            <mat-option [value]="cliente">
+                                {{cliente.nombreCliente +": "+cliente.ruc}}
+                            </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
 </div>
 
 @if (!scaneoRealizado) {
@@ -8,30 +34,11 @@
         <div class="col">
             <!-- For select files -->
             <div class="mb-3">
-                <label for="formFile" class="form-label ">Seleccione una imagen</label>
+                <label for="formFile" class="form-label " style="color: white;">Seleccione una imagen</label>
                 <input id="formFile" #file type="file" (change)="seleccionArchivo(file.files)"
                     [accept]="'.jpg, .png, .gif, .jpeg'" class="form-control btn btn-success my-2" />
             </div>
 
-            <!-- 
-                <h2 style="text-align:center;">NG Tesseract OCR Component</h2>
-                <h3 style="text-align:center;">Simple OCR Text</h3>
-        
-        
-                <div class="container">
-                    <div class="row">
-                        <div class="container">
-                            <div>
-                                <input type="file" (change)="onFileSelected($event)">
-                            </div>
-                            <div>
-                                {{text}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        
-                <br><br><br><br><br><br><br><br><br> -->
         </div>
     </div>
 </div>
@@ -69,42 +76,20 @@
                 <div>
                     <a class="data text-break" [hidden]="facturaVirtual">{{listQr[0]}}</a>
                 </div>
-                <!-- <p class="data">{{ actionFile.data.toString() }}</p> -->
             </div>
             }
             <div>
-                <!-- <a class="data text-break" [hidden]="esQr || facturaVirtual">{{text}}</a> -->
                 <a class="data text-break" [hidden]="esQr">{{text}}</a>
             </div>
 
-
-            <!-- 
-                    <h2 style="text-align:center;">NG Tesseract OCR Component</h2>
-                    <h3 style="text-align:center;">Simple OCR Text</h3>
-            
-            
-                    <div class="container">
-                        <div class="row">
-                            <div class="container">
-                                <div>
-                                    <input type="file" (change)="onFileSelected($event)">
-                                </div>
-                                <div>
-                                    {{text}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            
-                    <br><br><br><br><br><br><br><br><br> -->
         </div>
-
     </div>
 </div>
 }
 
 
 <div class="container text-center">
+
     @if (facturaElectronica) {
     <form class="form-scanner" [formGroup]="formElectronica" (ngSubmit)="guardarFactura()">
 
@@ -181,6 +166,8 @@
             <div class="col col-8">
                 <!-- Fecha de Emisión de la factura... -->
                 <mat-form-field class="form-scanner-full-width">
+
+
                     <mat-label>Fecha de Emisión:</mat-label>
                     <input formControlName="fechaEmision" matInput placeholder="Ej: 01/01/2024"
                         value="{{fechaEmision}}">
@@ -275,7 +262,7 @@
     }
 
     @if (facturaVirtual) {
-    <form class="form-scanner" [formGroup]="formVirtual" (ngSubmit)="guardarFactura()">
+    <form class="form-scanner" [formGroup]="formVirtual">
 
         <div class="row">
             <!-- Cabecera de la factura -->
@@ -285,7 +272,7 @@
                     <div class="col-lg-12">
                         <mat-form-field class="form-scanner-full-width">
                             <mat-label>Tipo Factura:</mat-label>
-                            <input formControlName="tipoFactura" matInput placeholder="Ej: Factura Virtual"
+                            <input matInput formControlName="tipoFactura" placeholder="Ej: Factura Virtual"
                                 value="Factura Virtual">
                         </mat-form-field>
                     </div>
@@ -325,8 +312,12 @@
                 <div class="col-lg-12"><!-- Fecha Inicio Vigencia de la factura... -->
                     <mat-form-field class="form-scanner-full-width">
                         <mat-label>Fecha Inicio Vigencia:</mat-label>
-                        <input matInput formControlName="fechaInicioVig" pattern="\d{2}/\d{2}/\d{4}"
-                            placeholder="Ej: 01/01/2024" required="true">
+                        <input matInput [matDatepicker]="fechaInicioVig" formControlName="fechaInicioVig">
+                        <mat-hint>DD/MM/YYYY</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="fechaInicioVig"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #fechaInicioVig></mat-datepicker>
+                        <!-- <input matInput formControlName="fechaInicioVig" pattern="\d{2}/\d{2}/\d{4}"
+                            placeholder="Ej: 01/01/2024" required="true"> -->
                     </mat-form-field>
                 </div>
                 <div class="col-lg-12"><!-- Numero de la Factura... -->
@@ -343,9 +334,18 @@
             <div class="col col-8"><!-- Fecha de Emisión de la factura... -->
 
                 <mat-form-field class="form-scanner-full-width">
+
                     <mat-label>Fecha de Emisión:</mat-label>
+                    <input matInput [matDatepicker]="fechaEmision" formControlName="fechaEmision">
+                    <mat-hint>DD/MM/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="fechaEmision"></mat-datepicker-toggle>
+                    <mat-datepicker touchUi #fechaEmision></mat-datepicker>
+
+
+
+                    <!-- <mat-label>Fecha de Emisión:</mat-label>
                     <input matInput formControlName="fechaEmision" pattern="\d{2}/\d{2}/\d{4}"
-                        placeholder="Ej: 01/01/2024" required="true">
+                        placeholder="Ej: 01/01/2024" required="true"> -->
                 </mat-form-field>
             </div>
             <div class="col col-4"><!-- Condición de Venta de la factura... -->
@@ -419,7 +419,7 @@
                     <div class="col-6"></div>
                     <div class="col-6 d-grid gap-2 d-md-flex justify-content-md-end">
                         <button class="btn btn-success" tabindex="-1" role="button" aria-disabled="true"
-                            [disabled]="!formVirtual.valid">
+                            [disabled]="!formVirtual.valid && formularioValido" (click)="guardarFactura()">
                             <span>Guardar</span>
                         </button>
                         <button class="btn btn-danger" tabindex="-1" role="button" aria-disabled="true"

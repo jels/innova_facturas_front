@@ -10,18 +10,18 @@ import { SafePipe } from '../../shared/pipes/safe.pipe';
 
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   FormsModule,
-  Validators,
-  FormControl,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import {
-  LOAD_WASM,
   NgxScannerQrcodeComponent,
   NgxScannerQrcodeModule,
   NgxScannerQrcodeService,
@@ -30,21 +30,32 @@ import {
   ScannerQRCodeSelectedFiles,
 } from 'ngx-scanner-qrcode';
 
-LOAD_WASM().subscribe((res: any) => {
-  console.log('LOAD_WASM', res);
-});
+// LOAD_WASM().subscribe((res: any) => {
+//   console.log('LOAD_WASM', res);
+// });
 
-import { createWorker } from 'tesseract.js';
-import { LoadingComponent } from '../../shared/components/modal/loading/loading.component';
-import { MatInputModule } from '@angular/material/input';
+import {
+  MAT_DATE_LOCALE,
+  provideNativeDateAdapter,
+} from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { Router } from '@angular/router';
+import { createWorker } from 'tesseract.js';
+import { Empresa } from '../../core/model/Empresa';
 import { Factura } from '../../core/model/Factura';
+import { User } from '../../core/model/User';
+import { ClienteService } from '../../core/services/cliente.service';
+import { EmpresaService } from '../../core/services/empresa.service';
 import { FacturaService } from '../../core/services/factura.service';
 import { UserService } from '../../core/services/user.service';
-import { User } from '../../core/model/User';
-import { Rol } from '../../core/model/Rol';
+import { LoadingComponent } from '../../shared/components/modal/loading/loading.component';
 import { FechaPipe } from '../../shared/pipes/fecha.pipe';
+import { Cliente } from '../../core/model/Cliente';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-scann',
@@ -61,6 +72,13 @@ import { FechaPipe } from '../../shared/pipes/fecha.pipe';
     MatIconModule,
     ReactiveFormsModule,
     FechaPipe,
+    MatSelectModule,
+    MatDatepickerModule,
+    DatePipe,
+  ],
+  providers: [
+    provideNativeDateAdapter(),
+    { provide: MAT_DATE_LOCALE, useValue: 'es-PY' },
   ],
   templateUrl: './scann.component.html',
   styleUrl: './scann.component.scss',
@@ -71,7 +89,10 @@ export class ScannComponent implements AfterViewInit, OnInit {
   idUser = 1;
   user: User;
 
+  empresa: Empresa;
+
   camposValidos: boolean = true;
+  formularioValido = true;
 
   formElectronica: FormGroup;
   formVirtual: FormGroup;
@@ -83,24 +104,26 @@ export class ScannComponent implements AfterViewInit, OnInit {
   otrosTiposFacturas = false;
   loading: boolean = false;
 
-  rucEmisor: String = '';
+  rucEmisor = '';
   razonSocialEmisor = '';
-  timbradoNro: String = '';
-  fechaInicioVig: String = '';
-  fechaFinVig: String = '';
-  rucReceptor: String = '';
-  razonSocialReceptor: String = '';
-  nroFactura: String = '';
-  fechaEmision: String = '';
-  condicionVenta: String = '';
-  montoTotal: String = '';
-  montoIva10: String = '';
-  montoIva5: String = '';
-  montoExenta: String = '';
-  montoTotalIVA: String = '';
-  tipoFactura: String = '';
-  codigoControl: String = '';
-  tipoDato: String = '';
+  timbradoNro = '';
+  fechaInicioVig = '';
+  fechaFinVig = '';
+  rucReceptor = '';
+  razonSocialReceptor = '';
+  nroFactura = '';
+  fechaEmision = '';
+  condicionVenta = '';
+  montoTotal = '';
+  montoIva10 = '';
+  montoIva5 = '';
+  montoExenta = '';
+  montoTotalIVA = '';
+  tipoFactura = '';
+  codigoControl = '';
+  tipoDato = '';
+
+  clientes: Cliente[] = [];
 
   scaneoRealizado = false;
   listQr: Array<String> = [];
@@ -132,11 +155,17 @@ export class ScannComponent implements AfterViewInit, OnInit {
       },
     ],
   };
+  durationInSeconds = 5;
 
   qrCodeResult: ScannerQRCodeSelectedFiles[] = [];
   qrCodeResult2: ScannerQRCodeSelectedFiles[] = [];
   percentage = 80;
   quality = 100;
+  clientesControl = new FormControl<Cliente | null>(null);
+
+  form = new FormGroup({
+    clientes: this.clientesControl,
+  });
 
   @ViewChild('action') action!: NgxScannerQrcodeComponent;
 
@@ -145,18 +174,23 @@ export class ScannComponent implements AfterViewInit, OnInit {
     private fb: FormBuilder,
     private _facturaService: FacturaService,
     private _userService: UserService,
-    private fechaPipe: FechaPipe
+    private _empresaService: EmpresaService,
+    private fechaPipe: FechaPipe,
+    private _router: Router,
+    private _clienteService: ClienteService,
+    private _snackBar: MatSnackBar
   ) {
     this.user = {
-      idUser: null,
+      idUser: 0,
+      idEmpresa: 0,
       rol: {
         idRol: 0,
         nombreRol: '',
         statusRol: '',
         createdAt: new Date(),
-        createdBy: null,
+        createdBy: 0,
         updatedAt: new Date(),
-        updatedBy: null,
+        updatedBy: 0,
       },
       username: '',
       password: '',
@@ -172,11 +206,24 @@ export class ScannComponent implements AfterViewInit, OnInit {
         statusPersona: '',
         createdAt: new Date(),
         updatedAt: new Date(),
-        updatedBy: null,
-        createdBy: null,
+        updatedBy: 0,
+        createdBy: 0,
       },
       statusUser: '',
-      createdBy: null,
+      createdBy: 0,
+    };
+    this.empresa = {
+      idEmpresa: 0,
+      nombreEmpresa: '',
+      rucEmpresa: '',
+      direccionEmpresa: '',
+      telefonoEmpresa: '',
+      correoEmpresa: '',
+      statusEmpresa: '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      createdBy: 0,
+      updatedBy: 0,
     };
     this.formElectronica = this.fb.group({
       cdc: ['', Validators.required],
@@ -235,6 +282,7 @@ export class ScannComponent implements AfterViewInit, OnInit {
   }
 
   ngOnInit() {
+    this.formularioValido = true;
     this.scaneoRealizado = false;
     this.esQr = false;
     this.formVirtual = new FormGroup({
@@ -259,6 +307,16 @@ export class ScannComponent implements AfterViewInit, OnInit {
     this._userService.getUserById(this.idUser).subscribe((user) => {
       this.user = user.objeto;
       console.log('El usuario es: ', this.user);
+      this._empresaService
+        .getEmpresa(this.user.idEmpresa)
+        .subscribe((empresa) => {
+          this.empresa = empresa.objeto;
+          console.log('La empresa es: ', this.empresa);
+        });
+    });
+    this._clienteService.getAllClientes().subscribe((clientes) => {
+      this.clientes = clientes.objeto;
+      console.log('Los clientes son: ', this.clientes);
     });
   }
 
@@ -266,6 +324,11 @@ export class ScannComponent implements AfterViewInit, OnInit {
     // this.action.isReady.subscribe((res: any) => {
     //   this.handle(this.action, 'start');
     // });
+  }
+
+  convertStringToDate(dateString: string): Date {
+    const [day, month, year] = dateString.split('/').map(Number);
+    return new Date(year, month - 1, day); // month is 0-based in JavaScript Date
   }
 
   convertirFecha(fecha: string, condicion: string): string {
@@ -318,16 +381,7 @@ export class ScannComponent implements AfterViewInit, OnInit {
     } else if (this.datosQrVirtual(text)) {
       this.facturaVirtual = true;
       console.log('Es un QR valido de Factura Virtual');
-      this.formVirtual.get('tipoFactura')!.setValue('Factura Virtual');
-      this.formVirtual
-        .get('codigoControl')!
-        .setValue(this.facturaVirtualQr[0].toUpperCase());
-      this.formVirtual.get('timbradoNro')!.setValue(this.facturaVirtualQr[1]);
-      this.formVirtual.get('nroFactura')!.setValue(this.facturaVirtualQr[2]);
-      this.formVirtual.get('rucEmisor')!.setValue(this.facturaVirtualQr[3]);
-      this.formVirtual.get('montoTotal')!.setValue(this.facturaVirtualQr[4]);
       console.log(text);
-
       return true;
     } else {
       this.listQr = [];
@@ -466,9 +520,11 @@ export class ScannComponent implements AfterViewInit, OnInit {
     this.facturaElectronica = false;
     this.facturaVirtual = false;
     this.otrosTiposFacturas = false;
+    this.formularioValido = true;
   }
 
   async recognizeText(path: string) {
+    console.log('Antes formVirtual', this.formVirtual);
     const worker = await createWorker('spa', 1, {
       // logger: (m) => console.log(m), // Add logger here
     });
@@ -479,51 +535,151 @@ export class ScannComponent implements AfterViewInit, OnInit {
     this.text = text;
     this.facturaVirtual = this.buscarExistenciaFrase('FACTURA VIRTUAL', text);
     if (this.facturaVirtual) {
-      if (this.codigoControl === '') {
+      this.tipoFactura = 'FACTURA VIRTUAL';
+      if (this.facturaVirtualQr.length === 0) {
+        //CASO QUE NO RECONOZCA EL QR
+
+        this.razonSocialEmisor = '';
+        this.pattern = '(\\d+-\\d+)';
+        this.rucEmisor = this.extractTextRucVirtual(text, 'RUC ', this.pattern);
+        this.rucReceptor = this.extractTextRucVirtual(
+          text,
+          'IDENTIDAD:',
+          this.pattern
+        );
+
+        this.razonSocialReceptor = this.extractRazonSocialVirtual(
+          text,
+          'SOCIAL:',
+          'DIRECCION:'
+        );
+        this.montoExenta = '';
+        this.condicionVenta = '';
+        this.montoTotal = '';
+        this.extractValueIVA(text);
+
+        this.fechaEmision = this.extractDate(text, 'EMISION:');
+        this.fechaInicioVig = this.extractDate(text, 'INICIO DE VIGENCIA');
+
         this.codigoControl = this.extractCodigoControl(text).toString();
-      }
-      if (this.nroFactura === '') {
         this.nroFactura = this.extractFacturaNro(text).toString();
-      }
-      if (this.timbradoNro === '') {
         this.timbradoNro = this.extractTimbradoNro(text).toString();
+
+        //AQUI SE CARGA EL FORMULARIO
+        this.formVirtual = this.fb.group({
+          codigoControl: [this.codigoControl, Validators.required],
+          rucEmisor: [this.rucEmisor, Validators.required],
+          razonSocialEmisor: [this.razonSocialEmisor, Validators.required],
+          timbradoNro: [this.timbradoNro, Validators.required],
+          fechaInicioVig: [
+            this.convertStringToDate(this.fechaInicioVig),
+            Validators.required,
+          ],
+          rucReceptor: [this.rucReceptor, Validators.required],
+          razonSocialReceptor: [this.razonSocialReceptor, Validators.required],
+          nroFactura: [this.nroFactura, Validators.required],
+          fechaEmision: [
+            this.convertStringToDate(this.fechaEmision),
+            Validators.required,
+          ],
+          condicionVenta: [this.condicionVenta, Validators.required],
+          montoTotal: [this.montoTotal, Validators.required],
+          montoIva10: [this.montoIva10, Validators.required],
+          montoIva5: [this.montoIva5, Validators.required],
+          montoExenta: [this.montoExenta, Validators.required],
+          montoTotalIVA: [this.montoTotalIVA, Validators.required],
+          tipoFactura: [this.tipoFactura, Validators.required],
+        });
+
+        if (this.clientesControl != null || undefined) {
+          console.log(
+            'Ruc del Cliente Control: ' + this.clientesControl.value?.ruc
+          );
+          console.log('Ruc del Ruc Receptor: ' + this.rucReceptor);
+
+          if (this.clientesControl.value?.ruc === this.rucReceptor) {
+            this.formularioValido = false;
+          } else {
+            this.openSnackBar(
+              'El Ruc Receptor no coincide con el Cliente seleccionado',
+              'CERRAR'
+            );
+            this.formularioValido = true;
+          }
+        } else {
+          this.formularioValido = false;
+        }
+      } else {
+        //CASO QUE RECONOZCA EL QR
+        this.razonSocialEmisor = '';
+        this.pattern = '(\\d+-\\d+)';
+        this.rucEmisor = this.extractTextRucVirtual(text, 'RUC ', this.pattern);
+        this.rucReceptor = this.extractTextRucVirtual(
+          text,
+          'IDENTIDAD:',
+          this.pattern
+        );
+
+        this.razonSocialReceptor = this.extractRazonSocialVirtual(
+          text,
+          'SOCIAL:',
+          'DIRECCION:'
+        );
+        this.montoExenta = '';
+        this.condicionVenta = '';
+        this.extractValueIVA(text);
+
+        this.fechaEmision = this.extractDate(text, 'EMISION:');
+        this.fechaInicioVig = this.extractDate(text, 'INICIO DE VIGENCIA');
+
+        //AQUI SE CARGA EL FORMULARIO
+        this.formVirtual = this.fb.group({
+          tipoFactura: [this.tipoFactura, Validators.required],
+          timbradoNro: [this.facturaVirtualQr[1], Validators.required],
+          codigoControl: [this.facturaVirtualQr[0], Validators.required],
+          fechaInicioVig: [
+            this.convertStringToDate(this.fechaInicioVig),
+            Validators.required,
+          ],
+          rucEmisor: [this.rucEmisor, Validators.required],
+          razonSocialEmisor: [this.razonSocialEmisor, Validators.required],
+          rucReceptor: [this.rucReceptor, Validators.required],
+          razonSocialReceptor: [this.razonSocialReceptor, Validators.required],
+          nroFactura: [this.facturaVirtualQr[2], Validators.required],
+          fechaEmision: [
+            this.convertStringToDate(this.fechaEmision),
+            Validators.required,
+          ],
+          condicionVenta: [this.condicionVenta, Validators.required],
+          montoTotal: [this.facturaVirtualQr[4], Validators.required],
+          montoIva10: [this.montoIva10, Validators.required],
+          montoIva5: [this.montoIva5, Validators.required],
+          montoExenta: [this.montoExenta, Validators.required],
+          montoTotalIVA: [this.montoTotalIVA, Validators.required],
+        });
+
+        if (this.clientesControl != null || undefined) {
+          console.log(
+            'Ruc del Cliente Control: ' + this.clientesControl.value?.ruc
+          );
+          console.log('Ruc del Ruc Receptor: ' + this.rucReceptor);
+
+          if (this.clientesControl.value?.ruc === this.rucReceptor) {
+            this.formularioValido = false;
+          } else {
+            this.openSnackBar(
+              'El Ruc Receptor no coincide con el Cliente seleccionado',
+              'CERRAR'
+            );
+            this.formularioValido = true;
+          }
+        } else {
+          this.formularioValido = false;
+        }
       }
-
-      this.razonSocialEmisor = '';
-      this.pattern = '(\\d+-\\d+)';
-      this.rucEmisor = this.extractTextRucVirtual(text, 'RUC ', this.pattern);
-      this.rucReceptor = this.extractTextRucVirtual(
-        text,
-        'IDENTIDAD:',
-        this.pattern
-      );
-
-      this.razonSocialReceptor = this.extractRazonSocialVirtual(
-        text,
-        'SOCIAL:',
-        'DIRECCION:'
-      );
-      // this.pattern = '\\d+-\\d+';
-      // this.rucEmisor = this.extractText(text, 'RUC', this.pattern);
-      this.montoExenta = '';
-      this.condicionVenta = '';
-      this.extractValueIVA(text);
-
-      this.fechaEmision = this.extractDate(text, 'EMISION:');
-      this.fechaInicioVig = this.extractDate(text, 'INICIO DE VIGENCIA');
-
-      this.formVirtual
-        .get('razonSocialReceptor')!
-        .setValue(this.razonSocialReceptor);
-      this.formVirtual.get('rucReceptor')!.setValue(this.rucReceptor);
-      this.formVirtual.get('rucEmisor')!.setValue(this.rucEmisor);
-
-      this.formVirtual.get('fechaEmision')!.setValue(this.fechaEmision);
-      this.formVirtual.get('fechaInicioVig')!.setValue(this.fechaInicioVig);
-
-      // this.fechaFinVig = this.extractDate(text, 'FIN DE VIGENCIA');
-    } else {
     }
+
+    console.log('Despues formVirtual', this.formVirtual);
     this.dialog.closeAll();
     await worker.terminate();
   }
@@ -710,10 +866,8 @@ export class ScannComponent implements AfterViewInit, OnInit {
     const regex = /CONTROL\s+([A-Za-z0-9]{8})/i;
     const match = text.match(regex);
 
-    if (match) {
-      return match[1];
-    }
-    return '';
+    return match ? match[1] : '';
+    // Eliminar cualquier espacio alrededor de los guiones
   }
 
   extractTextRucVirtual(text: string, search: string, pattern: string): string {
@@ -737,7 +891,8 @@ export class ScannComponent implements AfterViewInit, OnInit {
     const match = fullText.match(regexPattern);
     if (match) {
       const extractedText = match[1].trim();
-      return extractedText.split(/\s+/).toString(); // Separar el texto por espacios
+      return extractedText.split(/\s+/).toString();
+      // Separar el texto por espacios
     }
     return '';
   }
@@ -778,39 +933,6 @@ export class ScannComponent implements AfterViewInit, OnInit {
         console.log('El IVA en su totalidad es 5%');
       }
     }
-
-    // if (match10 === '-1' && match5 === '-1') {
-    //   if (match5 && match5.length > 1 && match10 && match10.length > 1) {
-    //     if (match5[1] === '0') {
-    //       if (match10[1] === '0') {
-    //         console.log('El total es Excento de IVA');
-    //         this.montoTotalIVA = '0';
-    //         this.montoExenta = '0';
-    //         this.montoIva5 = '0';
-    //         this.montoIva10 = '0';
-    //       } else {
-    //         this.montoIva10 = match10[1];
-    //         this.montoTotal = (
-    //           Number(this.montoTotal) + Number(this.montoIva10)
-    //         ).toString();
-    //         //this.montoIva10 = ((Number(this.montoTotal) * 11) / 100).toString();
-    //         console.log('El total es con IVA 10%');
-    //       }
-    //     } else {
-    //       if (match10[1] === '0') {
-    //         console.log('El total es con iva 5%');
-    //       } else {
-    //         console.log('El total es con IVA 5% y 10%');
-    //       }
-    //     }
-    //   }
-    // } else {
-    //   console.log('El total es Excento de IVA');
-    //   this.montoTotalIVA = '0';
-    //   this.montoIva10 = '0';
-    //   this.montoIva5 = '0';
-    //   this.montoExenta = '0';
-    // }
   }
 
   extractValue10(text: string): string {
@@ -846,41 +968,30 @@ export class ScannComponent implements AfterViewInit, OnInit {
     return match ? match[1].trim() : '';
   }
 
-  // Método para probar la extracción
-  testExtraction() {
-    const text = 'RAZON SOCIAL: JUANITO SA, OTRA INFORMACION';
-    const prefix = 'RAZON SOCIAL:';
-    const limitChar = ',';
-    const extractedData = this.extractDataVirtual(text, prefix, limitChar);
-    console.log(extractedData); // Debería imprimir "JUANITO SA"
-  }
-
   guardarFactura() {
     console.log(this.formVirtual.value);
 
     let factura: Factura = {
       idFactura: null,
-
+      empresa: this.empresa,
       tipoFactura: this.formVirtual.value.tipoFactura,
       timbradoFactura: this.formVirtual.value.timbradoNro,
       cdcFactura: null,
-      codigoControlFactura: this.formVirtual.value.codigoControl,
+      codigoControlFactura: this.formVirtual.value.codigoControl.toUpperCase(),
       numeroFactura: this.formVirtual.value.nroFactura,
       rucEmisorFactura: this.formVirtual.value.rucEmisor,
-      razonSocialEmisorFactura: this.formVirtual.value.razonSocialEmisor,
+      razonSocialEmisorFactura:
+        this.formVirtual.value.razonSocialEmisor.toUpperCase(),
       rucReceptorFactura: this.formVirtual.value.rucReceptor,
-      razonSocialReceptorFactura: this.formVirtual.value.razonSocialReceptor,
-      condicionVentaFactura: this.formVirtual.value.condicionVenta,
-      statusFactura: 'ACTIVO',
-      fechaInicioVigenciaFactura: this.convertirFecha(
-        this.formVirtual.value.fechaInicioVig,
-        "yyyy-MM-dd'T'HH:mm:ss.SSS"
-      ),
+      razonSocialReceptorFactura:
+        this.formVirtual.value.razonSocialReceptor.toUpperCase(),
+      condicionVentaFactura:
+        this.formVirtual.value.condicionVenta.toUpperCase(),
+      statusFactura: 'ACTIVO'.toUpperCase(),
+      fechaInicioVigenciaFactura:
+        this.formVirtual.value.fechaInicioVig.toISOString(),
       fechaFinVigenciaFactura: null,
-      fechaEmisionFactura: this.convertirFecha(
-        this.formVirtual.value.fechaEmision,
-        "yyyy-MM-dd'T'HH:mm:ss.SSS"
-      ),
+      fechaEmisionFactura: this.formVirtual.value.fechaEmision.toISOString(),
 
       montoTotalFactura: this.formVirtual.value.montoTotal,
       montoTotalIvaFactura: this.formVirtual.value.montoTotalIVA,
@@ -895,11 +1006,58 @@ export class ScannComponent implements AfterViewInit, OnInit {
       createdBy: this.user,
     };
 
-    console.log('La factura...', factura);
+    console.log(this.clientesControl);
+    if (this.clientesControl.value?.ruc != null || undefined) {
+      console.log(
+        'Ruc del Cliente Control: ' + this.clientesControl.value?.ruc
+      );
+      console.log(
+        'Ruc del Ruc Receptor: ' + this.formVirtual.value.rucReceptor
+      );
 
-    this._facturaService.setFactura(factura).subscribe((resp) => {
-      console.log('La factura guardada...', resp);
-      console.log('Factura guardada con exito...!!!');
+      if (
+        this.clientesControl.value?.ruc === this.formVirtual.value.rucReceptor
+      ) {
+        this.formularioValido = false;
+        this._facturaService.setFactura(factura).subscribe((resp) => {
+          if (resp.mensaje === 'Error') {
+            console.log('No se pudo guardar la factura');
+          }
+          if (resp.mensaje === 'Exito') {
+            console.log('La factura guardada...', resp);
+            console.log('Factura guardada con exito...!!!');
+            this._router.navigate(['/dashboard']);
+          }
+        });
+      } else {
+        this.openSnackBar(
+          'El Ruc Receptor no coincide con el Cliente seleccionado',
+          'CERRAR'
+        );
+        this.formularioValido = true;
+      }
+    } else {
+      this.formularioValido = true;
+      this._facturaService.setFactura(factura).subscribe((resp) => {
+        if (resp.mensaje === 'Error') {
+          console.log('No se pudo guardar la factura');
+        }
+        if (resp.mensaje === 'Exito') {
+          console.log('La factura guardada...', resp);
+          console.log('Factura guardada con exito...!!!');
+          this._router.navigate(['/dashboard']);
+        }
+      });
+    }
+
+    console.log('La factura...', factura);
+  }
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      duration: 3000,
     });
   }
 }
