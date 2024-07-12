@@ -262,8 +262,8 @@ export class ScannComponent implements AfterViewInit, OnInit {
       tipoFactura: ['', Validators.required],
     });
     this.formFactura = this.fb.group({
-      rucEmisor: [this.rucEmisor, Validators.required],
-      razonSocialEmisor: [this.razonSocialEmisor, Validators.required],
+      rucEmisor: ['', Validators.required],
+      razonSocialEmisor: ['', Validators.required],
       timbradoNro: ['', Validators.required],
       fechaInicioVig: ['', Validators.required],
       fechaFinVig: ['', Validators.required],
@@ -521,6 +521,10 @@ export class ScannComponent implements AfterViewInit, OnInit {
     this.facturaVirtual = false;
     this.otrosTiposFacturas = false;
     this.formularioValido = true;
+    this.formVirtual.reset();
+    this.formElectronica.reset();
+    this.formFactura.reset();
+    this.form.reset();
   }
 
   async recognizeText(path: string) {

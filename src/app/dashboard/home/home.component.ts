@@ -495,4 +495,8 @@ export class HomeComponent {
     this.busquedaControl = new FormControl('', Validators.required);
     this.restaurarBusqueda = false;
   }
+
+  clean() {
+    this.formVirtual.reset();
+  }
 }

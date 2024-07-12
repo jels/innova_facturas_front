@@ -4,6 +4,7 @@ import { ScannComponent } from './scann/scann.component';
 import { ReportsComponent } from './reports/reports.component';
 import { DashboardComponent } from './dashboard.component';
 import { UsersComponent } from './users/users.component';
+import { ClientsComponent } from './clients/clients.component';
 
 export const DASHBOARD_ROUTES: Routes = [
   {
@@ -21,6 +22,10 @@ export const DASHBOARD_ROUTES: Routes = [
       {
         path: 'users',
         component: UsersComponent,
+      },
+      {
+        path: 'clients',
+        component: ClientsComponent,
       },
       {
         path: '**',

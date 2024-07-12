@@ -1,6 +1,4 @@
 import { Empresa } from './Empresa';
-import { Persona } from './Persona';
-import { Rol } from './Rol';
 
 export class Cliente {
   idCliente: number | null;
