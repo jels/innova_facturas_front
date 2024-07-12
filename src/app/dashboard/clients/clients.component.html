@@ -216,6 +216,35 @@
                     <form class="form-scanner" [formGroup]="formCliente">
 
                         <div class="row">
+                            <!-- Ruc del Cliente... -->
+                            <div class="col col-lg-6">
+                                <mat-form-field class="form-scanner-full-width">
+                                    <mat-label>Ruc Cliente:</mat-label>
+                                    <input matInput formControlName="rucCliente" pattern="\d{6,9}"
+                                        placeholder="Ej: 80001234">
+                                </mat-form-field>
+                            </div>
+
+                            <!-- Digito Verificador del RUC Cliente -->
+                            <div class="col col-lg-3">
+                                <mat-form-field class="form-scanner-full-width">
+                                    <mat-label>Digito Verificador:</mat-label>
+                                    <input matInput formControlName="dvRucCliente" pattern="\d{1}" required="true">
+                                </mat-form-field>
+                            </div>
+
+
+                            <!-- Razón Social Receptor de la factura... -->
+                            <div class="col col-3">
+                                <mat-form-field class="form-scanner-full-width">
+                                    <mat-label>Dia de Cierre:</mat-label>
+                                    <input matInput formControlName="fechaCierreCliente" pattern="\d{1,2}"
+                                        required="true">
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="row">
 
                             <!-- Cabecera de la factura -->
                             <div class="col col-6 align-self-center">
@@ -262,34 +291,6 @@
                         </div>
                         <div class="row">
 
-                        </div>
-                        <div class="row">
-                            <!-- Ruc del Cliente... -->
-                            <div class="col col-lg-6">
-                                <mat-form-field class="form-scanner-full-width">
-                                    <mat-label>Ruc Cliente:</mat-label>
-                                    <input matInput formControlName="rucCliente" pattern="\d{6,9}"
-                                        placeholder="Ej: 80001234" required="true">
-                                </mat-form-field>
-                            </div>
-
-                            <!-- Digito Verificador del RUC Cliente -->
-                            <div class="col col-lg-3">
-                                <mat-form-field class="form-scanner-full-width">
-                                    <mat-label>Digito Verificador:</mat-label>
-                                    <input matInput formControlName="dvRucCliente" pattern="\d{1}" required="true">
-                                </mat-form-field>
-                            </div>
-
-
-                            <!-- Razón Social Receptor de la factura... -->
-                            <div class="col col-3">
-                                <mat-form-field class="form-scanner-full-width">
-                                    <mat-label>Dia de Cierre:</mat-label>
-                                    <input matInput formControlName="fechaCierreCliente" pattern="\d{1,2}"
-                                        required="true">
-                                </mat-form-field>
-                            </div>
                         </div>
 
                     </form>
