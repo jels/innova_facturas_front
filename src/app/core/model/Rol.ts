@@ -1,5 +1,3 @@
-import { User } from './User';
-
 export class Rol {
   idRol: number;
   nombreRol: string;

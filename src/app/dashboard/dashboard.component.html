@@ -1,6 +1,56 @@
 <!-- Navbar -->
-<app-navbar></app-navbar>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand">Innova Services</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
 
+                <li>
+                    <a href="/dashboard" class="nav-link link-body-emphasis">
+                        <i class="fa fa-home" aria-hidden="true" style="padding-right: 5px;"></i>
+                        Inicio
+                    </a>
+                </li>
+                <li>
+                    <a href="/dashboard/scanning" class="nav-link link-body-emphasis">
+                        <i class="fa fa-qrcode" aria-hidden="true" style="padding-right: 5px;"></i>
+                        Escanear Facturas
+                    </a>
+                </li>
+                <li>
+                    <a href="/dashboard/reports" class="nav-link link-body-emphasis">
+                        <i class="fa fa-area-chart" aria-hidden="true" style="padding-right: 5px;"></i>
+                        Reportes
+                    </a>
+                </li>
+                <li>
+                    <a href="/dashboard/users" class="nav-link link-body-emphasis">
+                        <i class="fa fa-users" aria-hidden="true" style="padding-right: 5px;"></i>
+                        Usuarios
+                    </a>
+                </li>
+                <li>
+                    <a href="/dashboard/clients" class="nav-link link-body-emphasis">
+                        <i class="fa fa-address-card" aria-hidden="true" style="padding-right: 5px;"></i>
+                        Clientes
+                    </a>
+                </li>
+                <li>
+                    <a href="/dashboard/settings" class="nav-link link-body-emphasis">
+                        <i class="fa fa-cogs" aria-hidden="true" style="padding-right: 5px;"></i>
+                        Ajustes
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido principal -->
 <div class="container-fluid">
     <div class="row">
         <!-- Main content -->
@@ -30,7 +80,7 @@
         <mat-icon>flip</mat-icon>
     </button>
     <button mat-menu-item>
-        <a href="/dashboard" class="nav-link link-body-emphasis">
+        <a href="/dashboard/reports" class="nav-link link-body-emphasis">
             <span>Reportes</span>
         </a>
         <mat-icon>bar_chart</mat-icon>
@@ -48,5 +98,42 @@
         </a>
         <mat-icon>assignment_ind</mat-icon>
     </button>
+    <button mat-menu-item>
+        <a href="/dashboard/settings" class="nav-link link-body-emphasis">
+            <span>Ajustes</span>
+        </a>
+        <mat-icon>settings</mat-icon>
+    </button>
 </mat-menu>
-<app-footer />
+
+<!-- Footer -->
+<div class="bg-light" style="padding-left: 1%; padding-right: 1%; padding-top: 1px;">
+    <footer class="footer py-3 bg-light d-flex flex-wrap justify-content-between align-items-center my-4 border-top">
+        <div class="col-md-4 d-flex align-items-center">
+            <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+                <svg class="bi" width="30" height="24">
+                    <use xlink:href="#bootstrap" />
+                </svg>
+            </a>
+            <span class="mb-3 mb-md-0 text-body-secondary">&copy; 2024 Innova Services</span>
+        </div>
+
+        <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+            <li class="ms-3">
+                <a class="text-body-secondary" href="#">
+                    <i class="fa fa-facebook-square fa-2x" aria-hidden="true"></i>
+                </a>
+            </li>
+            <li class="ms-3">
+                <a class="text-body-secondary" href="#">
+                    <i class="fa fa-whatsapp fa-2x" aria-hidden="true"></i>
+                </a>
+            </li>
+            <li class="ms-3">
+                <a class="text-body-secondary" href="#">
+                    <i class="fa fa-instagram fa-2x" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </footer>
+</div>

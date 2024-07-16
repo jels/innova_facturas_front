@@ -5,6 +5,7 @@ import { ReportsComponent } from './reports/reports.component';
 import { DashboardComponent } from './dashboard.component';
 import { UsersComponent } from './users/users.component';
 import { ClientsComponent } from './clients/clients.component';
+import { SettingsComponent } from './settings/settings.component';
 
 export const DASHBOARD_ROUTES: Routes = [
   {
@@ -28,13 +29,17 @@ export const DASHBOARD_ROUTES: Routes = [
         component: ClientsComponent,
       },
       {
+        path: 'settings',
+        component: SettingsComponent,
+      },
+      {
+        path: 'reports',
+        component: ReportsComponent,
+      },
+      {
         path: '**',
         component: HomeComponent,
       },
-      // {
-      //   path: '**',
-      //   component: ScannComponent,
-      // },
     ],
   },
 ];
