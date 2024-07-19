@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, OnInit, Component, ViewChild } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import {
@@ -12,6 +12,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DATE_LOCALE,
+  MatRippleModule,
   provideNativeDateAdapter,
 } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -35,6 +36,13 @@ import { UserService } from '../../core/services/user.service';
 import { EditarFacturasComponent } from '../../shared/components/modal/editar-facturas/editar-facturas.component';
 import { FechaPipe } from '../../shared/pipes/fecha.pipe';
 import { FormatogsPipe } from '../../shared/pipes/formatogs.pipe';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import {
+  MatPaginator,
+  MatPaginatorModule,
+  PageEvent,
+} from '@angular/material/paginator';
 
 interface Meses {
   nombre: string;
@@ -70,6 +78,10 @@ interface Busqueda {
     MatSelectModule,
     MatDatepickerModule,
     MatIcon,
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
+    MatRippleModule,
   ],
   providers: [
     provideNativeDateAdapter(),
@@ -80,6 +92,28 @@ interface Busqueda {
   // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
+  length = 50;
+  pageSize = 10;
+  pageIndex = 0;
+  pageSizeOptions = [5, 10, 25];
+  hidePageSize = false;
+  showPageSizeOptions = false;
+  showFirstLastButtons = false;
+  disabled = false;
+
+  pageEvent!: PageEvent;
+  handlePageEvent(e: PageEvent) {
+    this.pageEvent = e;
+    this.length = e.length;
+    this.pageSize = e.pageSize;
+    this.pageIndex = e.pageIndex;
+  }
+  tipoDocumento = '11';
+  tipoRegistro = '1';
+  tipoComprobante = '109';
+  imputaIva = 'S';
+  imputaIre = 'N';
+  imputaIrpRsp = 'N';
   restaurarBusqueda = false;
   facturas: Factura[] = [];
   facturasFiltradas: Factura[] = [];
@@ -148,6 +182,24 @@ export class HomeComponent {
   });
   timeZone: string = '';
 
+  displayedColumns: string[] = [
+    'id',
+    'fecha',
+    'numeroFactura',
+    'tipoFactura',
+    'condicion',
+    'rucEmisorFactura',
+    'rsEmisorFactura',
+    'rucReceptorFactura',
+    'rslReceptorFactura',
+    'total',
+    'acciones',
+  ];
+  dataSource: MatTableDataSource<any>;
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
   constructor(
     private _facturaService: FacturaService,
     private fb: FormBuilder,
@@ -155,6 +207,7 @@ export class HomeComponent {
     private _clienteService: ClienteService,
     private _empresaService: EmpresaService
   ) {
+    this.dataSource = new MatTableDataSource();
     this.user = {
       idUser: 0,
       idEmpresa: 0,
@@ -238,6 +291,15 @@ export class HomeComponent {
     // this.anhos = datos;
   }
 
+  // ngAfterViewInit() {
+  //   if (this.paginator) {
+  //     this.dataSource.paginator = this.paginator;
+  //   } else {
+  //     console.error('Paginator is undefined');
+  //   }
+  //   this.dataSource.sort = this.sort;
+  // }
+
   ngOnInit(): void {
     this._userService.getUserById(this.idUser).subscribe((user) => {
       this.user = user.objeto;
@@ -259,6 +321,8 @@ export class HomeComponent {
         this.facturas = facturas.objeto;
         this.mensajeFacturas = facturas.mensaje;
       }
+
+      // this.dataSource = new MatTableDataSource(this.facturas);
       console.log(this.mensajeFacturas, this.facturas);
     });
 
@@ -266,6 +330,15 @@ export class HomeComponent {
       this.clientes = clientes.objeto;
       console.log('Los clientes son: ', this.clientes);
     });
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   convertDate(dateString: any): Date {
@@ -389,6 +462,9 @@ export class HomeComponent {
           this.facturasFiltradas.push(this.facturas[index]);
         }
       }
+      this.dataSource = new MatTableDataSource(this.facturasFiltradas);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     }
     //Null - Año - Cliente
     if (mes === undefined && anho != null && cliente != null) {
@@ -414,6 +490,9 @@ export class HomeComponent {
           }
         }
       }
+      this.dataSource = new MatTableDataSource(this.facturasFiltradas);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     }
     //Mes - Año - Cliente
     if (mes != null && anho != null && cliente != null) {
@@ -448,6 +527,9 @@ export class HomeComponent {
           }
         }
       }
+      this.dataSource = new MatTableDataSource(this.facturasFiltradas);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     }
     //Mes - Null - Cliente
     if (mes != null && anho === undefined && cliente != null) {
@@ -473,6 +555,9 @@ export class HomeComponent {
           }
         }
       }
+      this.dataSource = new MatTableDataSource(this.facturasFiltradas);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     }
 
     console.log(this.facturasFiltradas);
@@ -480,23 +565,27 @@ export class HomeComponent {
     this.filtrosAplicados = true;
   }
 
-  buscarDatosFacturas() {
-    console.log(
-      this.formBusqueda.value.textoBuscado,
-      this.busquedaControl.value
-    );
-    this.restaurarBusqueda = true;
+  editarAprobado(factura: Factura, tipo: string) {
+    console.log(factura, tipo);
   }
 
-  restaurarListaFacturas() {
-    this.formBusqueda = this.fb.group({
-      textoBuscado: ['', Validators.required],
-    });
-    this.busquedaControl = new FormControl('', Validators.required);
-    this.restaurarBusqueda = false;
-  }
+  // buscarDatosFacturas() {
+  //   console.log(
+  //     this.formBusqueda.value.textoBuscado,
+  //     this.busquedaControl.value
+  //   );
+  //   this.restaurarBusqueda = true;
+  // }
 
-  clean() {
-    this.formVirtual.reset();
-  }
+  // restaurarListaFacturas() {
+  //   this.formBusqueda = this.fb.group({
+  //     textoBuscado: ['', Validators.required],
+  //   });
+  //   this.busquedaControl = new FormControl('', Validators.required);
+  //   this.restaurarBusqueda = false;
+  // }
+
+  // clean() {
+  //   this.formVirtual.reset();
+  // }
 }

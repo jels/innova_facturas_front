@@ -17,4 +17,16 @@ export class RgfacturaService {
   getAllRgFacturas(): Observable<any> {
     return this.http.get<any>(this.api + 'rgfacturas');
   }
+
+  showAllORderASC(): Observable<any> {
+    return this.http.get<any>(this.api + 'rgfacturasasc');
+  }
+
+  findAllByRuc(ruc: number): Observable<any> {
+    return this.http.get<any>(this.api + 'rgfacturaruc/' + ruc);
+  }
+
+  listRg90(): Observable<any> {
+    return this.http.get<any>(this.api + 'listrgfacturas');
+  }
 }

@@ -1,8 +1,8 @@
 <div class="container" style="padding-top: 1%;">
     <div class="container-fluid text-center">
         <div class="row align-self-center">
-            <h3 class="text-center" style="color: white;">Lista de Ajustes</h3>
-            <div class="container">
+            <h3 class="text-center" style="color: white;">Lista de Periodos para RG90</h3>
+            <!-- <div class="container">
                 <div class="row">
                     <div class="col col-ls-2">
                         <button class="btn btn-success p-2 lh-1" type="button" mat-raised-button
@@ -18,40 +18,154 @@
                     </div>
                 </div>
                 <br />
-            </div>
+            </div> -->
+
+
+
+
+
+
             <div class="container-fluid">
-                <div class="table-responsive">
-                    <table class="table table-striped table-sm align-middle">
-                        <thead>
+
+                <mat-form-field>
+                    <mat-label>Filtrar</mat-label>
+                    <input matInput (keyup)="applyFilter($event)" placeholder="Ej. Mo o 800" #input>
+                </mat-form-field>
+
+                <div class="mat-elevation-z8" style="padding-bottom: 1%;">
+                    <table mat-table [dataSource]="dataSource" matSort>
+
+                        <!-- ID Column -->
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef> # </th>
+                            <td mat-cell *matCellDef="let row; let i = index"> {{ i+1 }} </td>
+                        </ng-container>
+
+                        <!-- Fecha Column -->
+                        <ng-container matColumnDef="ruc">
+                            <th mat-header-cell *matHeaderCellDef> RUC / CI </th>
+                            <td mat-cell *matCellDef="let row"> {{row.ruc}} </td>
+                        </ng-container>
+
+                        <!-- Fecha Column -->
+                        <ng-container matColumnDef="razonsocial">
+                            <th mat-header-cell *matHeaderCellDef> Razon Social </th>
+                            <td mat-cell *matCellDef="let row"> {{row.razonSocial}} </td>
+                        </ng-container>
+
+                        <!-- Nro Factura Column -->
+                        <ng-container matColumnDef="anho">
+                            <th mat-header-cell *matHeaderCellDef> Año </th>
+                            <td mat-cell *matCellDef="let row"> {{row.anhoPeriodo}} </td>
+                        </ng-container>
+
+                        <!-- Tipo Factura Column -->
+                        <ng-container matColumnDef="mes">
+                            <th mat-header-cell *matHeaderCellDef> Mes </th>
+                            <td mat-cell *matCellDef="let row"> {{row.mesPeriodo}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="generado">
+                            <th mat-header-cell *matHeaderCellDef> Estado RG90 </th>
+                            <td mat-cell *matCellDef="let row"> Pendiente </td>
+                        </ng-container>
+
+                        <!-- acciones Column -->
+                        <ng-container matColumnDef="acciones">
+                            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+                            <td mat-cell *matCellDef="let row">
+
+                                <button class="btn btn-warning rounded-circle p-2 lh-1 position-relative" type="button"
+                                    style="margin-right: 5px;" data-bs-toggle="modal" data-bs-target="#listaFacturas"
+                                    (click)="listarFacturas(row)" matTooltip="Visualizar Facturas">
+                                    <i class="fa fa-binoculars" aria-hidden="true"></i>
+                                </button>
+
+                                @if(!rg90){
+                                <button class="btn btn-success rounded-circle p-2 lh-1" type="button"
+                                    style="margin-right: 5px;" matTooltip="Descargar RG90" disabled>
+                                    <i class="fa fa-download" aria-hidden="true"></i>
+                                </button>
+                                }
+                                @if(rg90){
+                                <button class="btn btn-success rounded-circle p-2 lh-1" type="button"
+                                    style="margin-right: 5px;" matTooltip="Descargar RG90">
+                                    <i class="fa fa-download" aria-hidden="true"></i>
+                                </button>
+                                }
+
+                                @if(rg90){
+                                <button class="btn btn-info rounded-circle p-2 lh-1" type="button"
+                                    style="margin-right: 5px;" matTooltip="RG90 Generado" style="color: white;"
+                                    disabled>
+                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                </button>
+                                }
+                                @if(!rg90){
+                                <button class="btn btn-info rounded-circle p-2 lh-1" type="button"
+                                    style="margin-right: 5px;" matTooltip="RG90 No generado">
+                                    <i class="fa fa-exclamation-triangle" style="color: white;" aria-hidden="true"></i>
+                                </button>
+                                }
+
+
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="example-element-row"></tr>
+
+                        <!-- Row shown when there is no matching data. -->
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
+                        </tr>
+                    </table>
+
+                    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"
+                        aria-label="Select page of users"></mat-paginator>
+                </div>
+
+
+
+
+
+
+
+                <!-- <div class="table-responsive">
+                    <table class="table table-striped table-sm align-middle"> -->
+                <!-- <thead>
                             <tr>
-                                <th scope="col">Id</th>
-                                <th scope="col">Tipo</th>
-                                <th scope="col">Descripcion</th>
-                                <th scope="col">Acronimo</th>
-                                <th scope="col">Valor</th>
-                                <th scope="col">Status</th>
+                                <th scope="col">#</th>
+                                <th scope="col">RUC/CI</th>
+                                <th scope="col">Año</th>
+                                <th scope="col">Mes</th>
+                                <th scope="col">RG90</th>
                                 <th scope="col">Acciones</th>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <!-- @for (cliente of clientes; track $index) {
+                        </thead> -->
+                <!-- <tbody>
+                            @for (rg of listrg90; track $index) {
                             <tr>
-                                <td>{{ cliente.idCliente }}</td>
-                                <td>{{ cliente.nombreCliente }}</td>
-                                <td>{{ cliente.ruc }}</td>
-                                <td>{{ cliente.direccionCliente }}</td>
-                                <td>{{ cliente.telefonoCliente }}</td>
-                                <td>{{ cliente.correoCliente }}</td>
-                                <td>{{ cliente.estadoCliente }}</td>
-                                <td>{{ cliente.fechaCierreCliente }}</td>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ rg.ruc }}</td>
+                                <td>{{ rg.anhoPeriodo }}</td>
+                                <td>{{ rg.mesPeriodo }}</td>
+                                <td>False</td>
+
+
                                 <td>
                                     <button class="btn btn-warning rounded-circle p-2 lh-1 position-relative"
+                                        type="button" style="margin-right: 5px;" matTooltip="Visualizar Facturas">
+                                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    </button> -->
+                <!-- <button class="btn btn-warning rounded-circle p-2 lh-1 position-relative"
                                         type="button" style="margin-right: 5px;" data-bs-toggle="modal"
                                         data-bs-target="#updateCliente" (click)="modalCliente(cliente)"
                                         matTooltip="Editar">
                                         <i class="fa fa-pencil" aria-hidden="true"></i>
-                                    </button>
-                                    @if (cliente.estadoCliente==='ACTIVO') {
+                                    </button> -->
+                <!-- @if (cliente.estadoCliente==='ACTIVO') {
                                     <button class="btn btn-danger rounded-circle p-2 lh-1" type="button"
                                         (click)="cambiarEstado(cliente, 'INACTIVO')" matTooltip="Dar de Baja">
                                         <i class="fa fa-check" aria-hidden="true"></i>
@@ -62,16 +176,290 @@
                                         (click)="cambiarEstado(cliente,'ACTIVO')" matTooltip="Dar de Baja">
                                         <i class="fa fa-check" aria-hidden="true"></i>
                                     </button>
-                                    }
-                                </td>
+                                    } -->
+                <!-- </td>
                             </tr>
 
-                            } -->
+                            }
 
-                        </tbody>
+                        </tbody> -->
+                <!-- </table>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="listaFacturas" data-bs-backdrop="static" data-bs-keyboard="false"
+    aria-labelledby="listaFacturasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+
+        <div class="modal-content">
+
+            <div class="modal-header text-center">
+                <div class="container text-center">
+                    <h5>{{ textoCabeceraModalListaFacturas }}</h5>
+                </div>
+
+            </div>
+            <div class="modal-body">
+
+
+                <mat-form-field>
+                    <mat-label>Filtrar</mat-label>
+                    <input matInput (keyup)="applyFilter($event)" placeholder="Ej. Mo o 800" #input>
+                </mat-form-field>
+
+                <div class="mat-elevation-z8" style="padding-bottom: 1%;">
+                    <table mat-table [dataSource]="dataSourceSeleccionado" matSort>
+
+                        <!-- ID Column -->
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef> # </th>
+                            <td mat-cell *matCellDef="let row; let i = index"> {{ i+1 }} </td>
+                        </ng-container>
+
+                        <!-- Fecha Column -->
+                        <ng-container matColumnDef="codigoRegistro">
+                            <th mat-header-cell *matHeaderCellDef> Codigo Registro </th>
+                            <td mat-cell *matCellDef="let row"> {{row.codigoTipoRegistro}} </td>
+                        </ng-container>
+
+                        <!-- Fecha Column -->
+                        <ng-container matColumnDef="tipoComprador">
+                            <th mat-header-cell *matHeaderCellDef> Tipo Comprador </th>
+                            <td mat-cell *matCellDef="let row"> {{row.codigoTipoComprador}} </td>
+                        </ng-container>
+
+                        <!-- Nro Factura Column -->
+                        <ng-container matColumnDef="rucComprador">
+                            <th mat-header-cell *matHeaderCellDef> Ruc Comprador </th>
+                            <td mat-cell *matCellDef="let row"> {{row.nroIdentificadorComprador}} </td>
+                        </ng-container>
+
+                        <!-- Tipo Factura Column -->
+                        <ng-container matColumnDef="nombreComprador">
+                            <th mat-header-cell *matHeaderCellDef> Razon Social </th>
+                            <td mat-cell *matCellDef="let row"> {{row.nombreComprador}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="tipoComprobante">
+                            <th mat-header-cell *matHeaderCellDef> Tipo Comprobante </th>
+                            <td mat-cell *matCellDef="let row"> {{row.codigoTipoComprobante}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="timbrado">
+                            <th mat-header-cell *matHeaderCellDef> timbrado </th>
+                            <td mat-cell *matCellDef="let row"> {{row.nroTimbrado}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="nroComprobante">
+                            <th mat-header-cell *matHeaderCellDef> Numero Comprobante </th>
+                            <td mat-cell *matCellDef="let row"> {{row.nroComprobante}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="montoIva5">
+                            <th mat-header-cell *matHeaderCellDef> Grabada 5% </th>
+                            <td mat-cell *matCellDef="let row"> {{row.montoIva5}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="montoIva10">
+                            <th mat-header-cell *matHeaderCellDef> Grabada 10% </th>
+                            <td mat-cell *matCellDef="let row"> {{row.montoIva10}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="montoExenta">
+                            <th mat-header-cell *matHeaderCellDef> Grabada Exenta </th>
+                            <td mat-cell *matCellDef="let row"> {{row.montoExenta}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="montoTotal">
+                            <th mat-header-cell *matHeaderCellDef> Total Comprobante </th>
+                            <td mat-cell *matCellDef="let row"> {{row.montoTotalComprobante}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="condicionVenta">
+                            <th mat-header-cell *matHeaderCellDef> Condicion de Venta </th>
+                            <td mat-cell *matCellDef="let row"> {{row.condicionVenta}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="monedaExtranjera">
+                            <th mat-header-cell *matHeaderCellDef> Moneda Extranjera </th>
+                            <td mat-cell *matCellDef="let row"> {{row.monedaExtranjera}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="imputaIva">
+                            <th mat-header-cell *matHeaderCellDef> Imputa IVA </th>
+                            <td mat-cell *matCellDef="let row"> {{row.imputaIva}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="imputaIre">
+                            <th mat-header-cell *matHeaderCellDef> Imputa IRE </th>
+                            <td mat-cell *matCellDef="let row"> {{row.imputaIre}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="imputaIrpRsp">
+                            <th mat-header-cell *matHeaderCellDef> Imputa IRP - RSP </th>
+                            <td mat-cell *matCellDef="let row"> {{row.imputaIrpRsp}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="compAsociado">
+                            <th mat-header-cell *matHeaderCellDef> Comprobante Asociado </th>
+                            <td mat-cell *matCellDef="let row"> {{row.comprobanteAsociado}} </td>
+                        </ng-container>
+
+                        <!-- Condicion de venta Column -->
+                        <ng-container matColumnDef="timbradoCompAsociado">
+                            <th mat-header-cell *matHeaderCellDef> Timbrado Comp Asociado </th>
+                            <td mat-cell *matCellDef="let row"> {{row.timbradoComprobanteAsociado}} </td>
+                        </ng-container>
+
+
+
+                        <!-- acciones Column -->
+                        <!-- <ng-container matColumnDef="acciones">
+                                    <th mat-header-cell *matHeaderCellDef> Acciones </th>
+                                    <td mat-cell *matCellDef="let row">
+
+                                        <button class="btn btn-warning rounded-circle p-2 lh-1 position-relative"
+                                            type="button" style="margin-right: 5px;" data-bs-toggle="modal"
+                                            data-bs-target="#listaFacturas" (click)="listarFacturas(row)"
+                                            matTooltip="Visualizar Facturas">
+                                            <i class="fa fa-binoculars" aria-hidden="true"></i>
+                                        </button>
+
+                                        @if(!rg90){
+                                        <button class="btn btn-success rounded-circle p-2 lh-1" type="button"
+                                            style="margin-right: 5px;" matTooltip="Descargar RG90" disabled>
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </button>
+                                        }
+                                        @if(rg90){
+                                        <button class="btn btn-success rounded-circle p-2 lh-1" type="button"
+                                            style="margin-right: 5px;" matTooltip="Descargar RG90">
+                                            <i class="fa fa-download" aria-hidden="true"></i>
+                                        </button>
+                                        }
+
+                                        @if(rg90){
+                                        <button class="btn btn-info rounded-circle p-2 lh-1" type="button"
+                                            style="margin-right: 5px;" matTooltip="RG90 Generado" style="color: white;"
+                                            disabled>
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </button>
+                                        }
+                                        @if(!rg90){
+                                        <button class="btn btn-info rounded-circle p-2 lh-1" type="button"
+                                            style="margin-right: 5px;" matTooltip="RG90 No generado">
+                                            <i class="fa fa-exclamation-triangle" style="color: white;"
+                                                aria-hidden="true"></i>
+                                        </button>
+                                        }
+
+
+                                    </td>
+                                </ng-container> -->
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumnsFacturas"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumnsFacturas;"
+                            class="example-element-row"></tr>
+
+                        <!-- Row shown when there is no matching data. -->
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
+                        </tr>
                     </table>
+
+                    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"
+                        aria-label="Select page of users"></mat-paginator>
+
+
+
+
+
+
+
+                    <!-- <div class="table-responsive">
+                            <table class="table table-striped table-sm align-middle"> -->
+                    <!-- <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">RUC/CI</th>
+                                        <th scope="col">Año</th>
+                                        <th scope="col">Mes</th>
+                                        <th scope="col">RG90</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead> -->
+                    <!-- <tbody>
+                                    @for (rg of listrg90; track $index) {
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ rg.ruc }}</td>
+                                        <td>{{ rg.anhoPeriodo }}</td>
+                                        <td>{{ rg.mesPeriodo }}</td>
+                                        <td>False</td>
+        
+        
+                                        <td>
+                                            <button class="btn btn-warning rounded-circle p-2 lh-1 position-relative"
+                                                type="button" style="margin-right: 5px;" matTooltip="Visualizar Facturas">
+                                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                            </button> -->
+                    <!-- <button class="btn btn-warning rounded-circle p-2 lh-1 position-relative"
+                                                type="button" style="margin-right: 5px;" data-bs-toggle="modal"
+                                                data-bs-target="#updateCliente" (click)="modalCliente(cliente)"
+                                                matTooltip="Editar">
+                                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                            </button> -->
+                    <!-- @if (cliente.estadoCliente==='ACTIVO') {
+                                            <button class="btn btn-danger rounded-circle p-2 lh-1" type="button"
+                                                (click)="cambiarEstado(cliente, 'INACTIVO')" matTooltip="Dar de Baja">
+                                                <i class="fa fa-check" aria-hidden="true"></i>
+                                            </button>
+                                            }
+                                            @if (cliente.estadoCliente==='INACTIVO') {
+                                            <button class="btn btn-success rounded-circle p-2 lh-1" type="button"
+                                                (click)="cambiarEstado(cliente,'ACTIVO')" matTooltip="Dar de Baja">
+                                                <i class="fa fa-check" aria-hidden="true"></i>
+                                            </button>
+                                            } -->
+                    <!-- </td>
+                                    </tr>
+        
+                                    }
+        
+                                </tbody> -->
+                    <!-- </table>
+                        </div> -->
+
+
                 </div>
             </div>
+            <div class="modal-footer">
+                <!--data-bs-dismiss="modal"-->
+                <!-- <button type="button" class="btn btn-success" [disabled]="!formCliente.valid" (click)="nuevoCliente()"
+                    data-bs-dismiss="modal">Crear
+                    Cliente</button> -->
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="restaurarFiltos()">
+                    Cancelar</button>
+            </div>
+
         </div>
     </div>
 </div>

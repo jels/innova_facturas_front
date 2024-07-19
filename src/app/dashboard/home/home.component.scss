@@ -11,3 +11,20 @@
 ::ng-deep .cdk-overlay-container{
   z-index: 1200 !important;
 }
+
+th{
+  background-color: black !important;
+  color: white !important;
+}
+td{
+  height: 50px;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+tr.example-element-row:not(.example-expanded-row):hover {
+  background: whitesmoke;
+}

@@ -63,6 +63,118 @@
 @if(filtrosAplicados){
 <h5 class="mx-auto p-2 text-center" style="color: white;">Filtros aplicados: {{filtro}}</h5>
 
+
+<mat-form-field>
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
+</mat-form-field>
+
+<div class="mat-elevation-z8" style="padding-bottom: 1%;">
+    <table mat-table [dataSource]=" dataSource" matSort>
+
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> # </th>
+            <td mat-cell *matCellDef="let row; let i = index"> {{ i+1 }} </td>
+        </ng-container>
+
+        <!-- Fecha Column -->
+        <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef> Fecha </th>
+            <td mat-cell *matCellDef="let row"> {{row.fechaEmisionFactura | date: 'dd/MM/YYYY'}} </td>
+        </ng-container>
+
+        <!-- Nro Factura Column -->
+        <ng-container matColumnDef="numeroFactura">
+            <th mat-header-cell *matHeaderCellDef> Nro Factura </th>
+            <td mat-cell *matCellDef="let row"> {{row.numeroFactura}} </td>
+        </ng-container>
+
+        <!-- Tipo Factura Column -->
+        <ng-container matColumnDef="tipoFactura">
+            <th mat-header-cell *matHeaderCellDef> Tipo Factura </th>
+            <td mat-cell *matCellDef="let row"> {{row.tipoFactura}} </td>
+        </ng-container>
+
+        <!-- Condicion de venta Column -->
+        <ng-container matColumnDef="condicion">
+            <th mat-header-cell *matHeaderCellDef> Condicion de Venta </th>
+            <td mat-cell *matCellDef="let row"> {{row.condicionVentaFactura}} </td>
+        </ng-container>
+
+        <!-- Ruc Emisor Column -->
+        <ng-container matColumnDef="rucEmisorFactura">
+            <th mat-header-cell *matHeaderCellDef> RUC Emisor </th>
+            <td mat-cell *matCellDef="let row"> {{row.rucEmisorFactura}} </td>
+        </ng-container>
+
+        <!-- Razon social emisor Column -->
+        <ng-container matColumnDef="rsEmisorFactura">
+            <th mat-header-cell *matHeaderCellDef> Razón Social E </th>
+            <td mat-cell *matCellDef="let row"> {{row.razonSocialEmisorFactura}} </td>
+        </ng-container>
+
+        <!-- Ruc Receptor Column -->
+        <ng-container matColumnDef="rucReceptorFactura">
+            <th mat-header-cell *matHeaderCellDef> RUC Receptor </th>
+            <td mat-cell *matCellDef="let row"> {{row.rucReceptorFactura}} </td>
+        </ng-container>
+
+        <!-- Razon social Receptor Column -->
+        <ng-container matColumnDef="rslReceptorFactura">
+            <th mat-header-cell *matHeaderCellDef> Razón Social R </th>
+            <td mat-cell *matCellDef="let row"> {{row.razonSocialReceptorFactura}} </td>
+        </ng-container>
+
+        <!-- Total factura Column -->
+        <ng-container matColumnDef="total">
+            <th mat-header-cell *matHeaderCellDef> Monto Total </th>
+            <td mat-cell *matCellDef="let row"> {{row.montoTotalFactura | formatogs}} </td>
+        </ng-container>
+
+        <!-- acciones Column -->
+        <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+            <td mat-cell *matCellDef="let row">
+                <!-- @if(row.statusFactura==="APROBADO"){ -->
+
+                <button class="btn btn-warning rounded-circle p-2 lh-1 position-relative" type="button"
+                    style="margin-right: 5px;" (dblclick)="editarAprobado(row, row.tipoFactura)" data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop">
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                </button>
+                <button class="btn btn-success rounded-circle p-2 lh-1" type="button" disabled>
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                </button>
+                <!-- } -->
+                <!-- @if(row.statusFactura==="PENDIENTE"){ -->
+                <button class="btn btn-warning rounded-circle p-2 lh-1 position-relative" type="button"
+                    style="margin-right: 5px;" (click)="editarFactura(row, row.tipoFactura)" data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop">
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                </button>
+                <button class="btn btn-success rounded-circle p-2 lh-1" type="button">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                </button>
+                <!-- } -->
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="example-element-row"></tr>
+
+        <!-- Row shown when there is no matching data. -->
+        <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
+        </tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[10, 25, 100]" aria-label="Select page of users"></mat-paginator>
+</div>
+
+
+
+<!-- 
 <div class="container-fluid text-center">
     <form [formGroup]="formBusqueda">
         <div class="row form-scanner">
@@ -160,7 +272,7 @@
 
         </tbody>
     </table>
-</div>
+</div> -->
 
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -334,6 +446,100 @@
                                         placeholder="Ej: 1.000.000 Gs" required="true">
                                 </mat-form-field>
                             </div>
+                        </div>
+
+                        <!-- Valores para el RG90 -->
+                        <div class="row">
+                            <div class="col col-2">
+                                <!-- Excenta de la factura si es que existe... -->
+                                <mat-form-field class="form-scanner-full-width">
+                                    <mat-label>Tipo Registro</mat-label>
+                                    <!-- <input matInput formControlName="tipoRegistro" pattern="\d+"
+                                        placeholder="Ej: 10.000 Gs" required="true"> -->
+                                    <mat-select [(value)]="tipoRegistro" required="true">
+                                        <mat-option value="1">VENTAS</mat-option>
+                                        <mat-option value="2">COMPRAS</mat-option>
+                                        <mat-option value="3">INGRESOS</mat-option>
+                                        <mat-option value="4">EGRESOS</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col col-2">
+                                <!-- IVA 10% de la factura si es que existe... -->
+                                <mat-form-field class="form-scanner-full-width">
+                                    <mat-label>Tipo Docum.</mat-label>
+                                    <!-- <input matInput formControlName="montoIva5" pattern="\d+" placeholder="Ej: 5.000 Gs"
+                                        required="true"> -->
+                                    <mat-select [(value)]="tipoDocumento" required="true">
+                                        <mat-option value="11">RUC</mat-option>
+                                        <mat-option value="12">CÉDULA DE IDENTIDAD</mat-option>
+                                        <mat-option value="13">PASAPORTE</mat-option>
+                                        <mat-option value="14">CÉDULA EXTRANJERO</mat-option>
+                                        <mat-option value="15">SIN NOMBRE</mat-option>
+                                        <mat-option value="16">DIPLOMÁTICO</mat-option>
+                                        <mat-option value="17">IDENTIFICACIÓN TRIBUTARIA</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col col-2">
+                                <!-- IVA 10% de la factura si es que existe... -->
+                                <mat-form-field class="form-scanner-full-width">
+                                    <mat-label>Comprobante</mat-label>
+                                    <!-- <input matInput formControlName="montoIva10" pattern="\d+"
+                                        placeholder="Ej: 10.000 Gs" required="true"> -->
+                                    <mat-select [(value)]="tipoComprobante" required="true">
+                                        <mat-option value="101">AUTOFACTURA</mat-option>
+                                        <mat-option value="102">BOLETA DE TRANSPORTE PÚBLICO DE PASAJEROS</mat-option>
+                                        <mat-option value="103">BOLETA DE VENTA</mat-option>
+                                        <mat-option value="104">BOLETA RESIMPLE</mat-option>
+                                        <mat-option value="105">BOLETOS DE LOTERÍAS, JUEGOS DE AZAR</mat-option>
+                                        <mat-option value="106">BOLETO O TICKET DE TRANSPORTE AÉREO</mat-option>
+                                        <mat-option value="107">DESPACHO DE IMPORTACIÓN</mat-option>
+                                        <mat-option value="108">ENTRADA A ESPECTÁCULOS PÚBLICOS</mat-option>
+                                        <mat-option value="109">FACTURA</mat-option>
+                                        <mat-option value="110">NOTA DE CRÉDITO</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col col-2">
+                                <!-- Total IVA de la factura... -->
+                                <div class="col-lg-12">
+                                    <mat-form-field class="form-scanner-full-width">
+                                        <mat-label>IMPUTA IVA</mat-label>
+                                        <!-- <input matInput formControlName="montoTotalIVA" pattern="\d+"
+                                            placeholder="Ej: 12.000 Gs" required="true"> -->
+                                        <mat-select [(value)]="imputaIva" required="true">
+                                            <mat-option value="S">SI</mat-option>
+                                            <mat-option value="N">NO</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="col col-2">
+                                <!-- Monto Total de la factura... -->
+                                <mat-form-field class="form-scanner-full-width">
+                                    <mat-label>IMPUTA IRE</mat-label>
+                                    <!-- <input matInput formControlName="montoTotal" pattern="\d+"
+                                        placeholder="Ej: 1.000.000 Gs" required="true"> -->
+                                    <mat-select [(value)]="imputaIre" required="true">
+                                        <mat-option value="S">SI</mat-option>
+                                        <mat-option value="N">NO</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col col-2">
+                                <!-- Monto Total de la factura... -->
+                                <mat-form-field class="form-scanner-full-width">
+                                    <mat-label>IMPUTA IRP-RSP</mat-label>
+                                    <!-- <input matInput formControlName="montoTotal" pattern="\d+"
+                                        placeholder="Ej: 1.000.000 Gs" required="true"> -->
+                                    <mat-select [(value)]="imputaIrpRsp" required="true">
+                                        <mat-option value="S">SI</mat-option>
+                                        <mat-option value="N">NO</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+
                         </div>
 
                     </form>

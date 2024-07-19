@@ -3,6 +3,8 @@ import { Empresa } from './Empresa';
 export class RgFactura {
   idRgFactura: number;
   empresa: Empresa;
+  ruc: string;
+  razonSocial: string;
   mesPeriodo: string;
   anhoPeriodo: string;
   codigoTipoRegistro: string;
@@ -31,6 +33,8 @@ export class RgFactura {
   constructor(
     idRgFactura: number,
     empresa: Empresa,
+    ruc: string,
+    razonSocial: string,
     mesPeriodo: string,
     anhoPeriodo: string,
     codigoTipoRegistro: string,
@@ -59,6 +63,8 @@ export class RgFactura {
   ) {
     this.idRgFactura = idRgFactura;
     this.empresa = empresa;
+    this.ruc = ruc;
+    this.razonSocial = razonSocial;
     this.mesPeriodo = mesPeriodo;
     this.anhoPeriodo = anhoPeriodo;
     this.codigoTipoRegistro = codigoTipoRegistro;

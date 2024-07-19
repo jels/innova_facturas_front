@@ -630,7 +630,7 @@ export class ScannComponent implements AfterViewInit, OnInit {
           'DIRECCION:'
         );
         this.montoExenta = '';
-        this.condicionVenta = '';
+        this.condicionVenta = 'CONTADO';
         this.extractValueIVA(text);
 
         this.fechaEmision = this.extractDate(text, 'EMISION:');

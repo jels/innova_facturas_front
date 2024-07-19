@@ -1,43 +1,118 @@
-import { Component } from '@angular/core';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import { CommonModule } from '@angular/common';
+import { Component, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { Cliente } from '../../core/model/Cliente';
+import { Empresa } from '../../core/model/Empresa';
+import { Factura } from '../../core/model/Factura';
+import { FormularioRG90 } from '../../core/model/FormularioRG90';
+import { ListRg90Desglosado } from '../../core/model/listRg90Desglosado';
 import { RgFactura } from '../../core/model/RgFactura';
 import { User } from '../../core/model/User';
-import { Cliente } from '../../core/model/Cliente';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Empresa } from '../../core/model/Empresa';
 import { ClienteService } from '../../core/services/cliente.service';
-import { UserService } from '../../core/services/user.service';
-import { EmpresaService } from '../../core/services/empresa.service';
 import { CsvService } from '../../core/services/csv.service';
-import { ZipService } from '../../core/services/zip.service';
+import { EmpresaService } from '../../core/services/empresa.service';
 import { RgfacturaService } from '../../core/services/rgfactura.service';
-import { FormularioRG90 } from '../../core/model/FormularioRG90';
+import { UserService } from '../../core/services/user.service';
+import { ZipService } from '../../core/services/zip.service';
+import { FormatogsPipe } from '../../shared/pipes/formatogs.pipe';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [],
+  imports: [
+    MatTooltipModule,
+    MatTableModule,
+    CommonModule,
+    MatPaginatorModule,
+    MatSortModule,
+    FormatogsPipe,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed,void', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition(
+        'expanded <=> collapsed',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
+    ]),
+  ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',
 })
 export class ReportsComponent {
+  rg90 = true;
+  textoCabeceraModalListaFacturas = '';
   idCliente = 0;
   idUser = 1;
-  user: User;
-
+  user!: User;
   clientes: Cliente[] = [];
-
   rgFacturas: RgFactura[] = [];
+  listrg90: RgFactura[] = [];
+  listRg90Desglosado: ListRg90Desglosado;
 
-  cliente: Cliente;
+  cliente!: Cliente;
   mensaje: string = '';
   formCliente: FormGroup;
-
-  empresa: Empresa;
-
-  rgFactura: RgFactura;
-
-  formularioRg90: FormularioRG90;
+  empresa!: Empresa;
+  rgFactura!: RgFactura;
+  formularioRg90!: FormularioRG90;
   facturasRq90: FormularioRG90[] = [];
+  displayedColumns: string[] = [
+    'id',
+    'ruc',
+    'razonsocial',
+    'anho',
+    'mes',
+    'generado',
+    'acciones',
+  ];
+  displayedColumnsFacturas: string[] = [
+    'id',
+    'codigoRegistro',
+    'tipoComprador',
+    'rucComprador',
+    'nombreComprador',
+    'tipoComprobante',
+    'timbrado',
+    'nroComprobante',
+    'montoIva5',
+    'montoIva10',
+    'montoExenta',
+    'montoTotal',
+    'condicionVenta',
+    'monedaExtranjera',
+    'imputaIva',
+    'imputaIre',
+    'imputaIrpRsp',
+    'compAsociado',
+    'timbradoCompAsociado',
+  ];
+
+  dataSource: MatTableDataSource<any>;
+  dataSourceSeleccionado: MatTableDataSource<any>;
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private _clienteService: ClienteService,
@@ -48,6 +123,18 @@ export class ReportsComponent {
     private csvService: CsvService,
     private zipService: ZipService
   ) {
+    this.dataSource = new MatTableDataSource();
+    this.dataSourceSeleccionado = new MatTableDataSource();
+
+    this.listRg90Desglosado = {
+      ruc: '',
+      razonSocial: '',
+      anho: '',
+      mes: '',
+      estadoRg90: '',
+      rgFactura: [],
+    };
+
     this.formCliente = this.fb.group({
       nombreCliente: ['', Validators.required],
       rucCliente: ['', Validators.required],
@@ -57,159 +144,15 @@ export class ReportsComponent {
       correoCliente: ['', Validators.required],
       fechaCierreCliente: ['', Validators.required],
     });
-
-    this.formularioRg90 = {
-      codigoTipoRegistro: '',
-      codigoTipoComprador: '',
-      nroIdentificadorComprador: '',
-      nombreComprador: '',
-      codigoTipoComprobante: '',
-      fechaEmision: '',
-      nroTimbrado: '',
-      nroComprobante: '',
-      montoIva10: '',
-      montoIva5: '',
-      montoExenta: '',
-      montoTotalComprobante: '',
-      condicionVenta: '',
-      monedaExtranjera: '',
-      imputaIva: '',
-      imputaIre: '',
-      imputaIrpRsp: '',
-      comprobanteAsociado: '',
-      timbradoComprobanteAsociado: '',
-    };
-
-    this.rgFactura = {
-      idRgFactura: 0,
-      empresa: {
-        idEmpresa: 0,
-        nombreEmpresa: '',
-        rucEmpresa: '',
-        direccionEmpresa: '',
-        telefonoEmpresa: '',
-        correoEmpresa: '',
-        statusEmpresa: '',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        createdBy: 0,
-        updatedBy: 0,
-      },
-      mesPeriodo: '',
-      anhoPeriodo: '',
-      codigoTipoRegistro: '',
-      codigoTipoComprador: '',
-      nroIdentificadorComprador: '',
-      nombreComprador: '',
-      codigoTipoComprobante: '',
-      fechaEmision: '',
-      nroTimbrado: '',
-      nroComprobante: '',
-      montoIva10: '',
-      montoIva5: '',
-      montoExenta: '',
-      montoTotalComprobante: '',
-      condicionVenta: '',
-      monedaExtranjera: '',
-      imputaIva: '',
-      imputaIre: '',
-      imputaIrpRsp: '',
-      comprobanteAsociado: '',
-      timbradoComprobanteAsociado: '',
-      createdBy: 0,
-      createdAt: new Date(),
-      updatedBy: 0,
-      updatedAt: new Date(),
-    };
-
-    this.cliente = {
-      idCliente: 0,
-      empresa: {
-        idEmpresa: 0,
-        nombreEmpresa: '',
-        rucEmpresa: '',
-        direccionEmpresa: '',
-        telefonoEmpresa: '',
-        correoEmpresa: '',
-        statusEmpresa: '',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        createdBy: 0,
-        updatedBy: 0,
-      },
-      ruc: '',
-      nombreCliente: '',
-      rucCliente: '',
-      dvRucCliente: '',
-      direccionCliente: '',
-      telefonoCliente: '',
-      correoCliente: '',
-      estadoCliente: '',
-      fechaCierreCliente: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      createdBy: 0,
-      updatedBy: 0,
-    };
-
-    this.user = {
-      idUser: 0,
-      idEmpresa: 0,
-      rol: {
-        idRol: 0,
-        nombreRol: '',
-        statusRol: '',
-        createdAt: new Date(),
-        createdBy: 0,
-        updatedAt: new Date(),
-        updatedBy: 0,
-      },
-      username: '',
-      password: '',
-      lastLogin: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      persona: {
-        idPersona: 0,
-        nombrePersona: '',
-        apellidoPersona: '',
-        telefonoPersona: '',
-        ciPersona: '',
-        statusPersona: '',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        updatedBy: 0,
-        createdBy: 0,
-      },
-      statusUser: '',
-      createdBy: 0,
-    };
-
-    this.empresa = {
-      idEmpresa: 0,
-      nombreEmpresa: '',
-      rucEmpresa: '',
-      direccionEmpresa: '',
-      telefonoEmpresa: '',
-      correoEmpresa: '',
-      statusEmpresa: '',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      createdBy: 0,
-      updatedBy: 0,
-    };
   }
 
   ngOnInit(): void {
     this._userService.getUserById(this.idUser).subscribe((user) => {
       this.user = user.objeto;
-      console.log('El usuario es: ', this.user);
-
       this._empresaService
         .getEmpresa(this.user.idEmpresa)
         .subscribe((empresa) => {
           this.empresa = empresa.objeto;
-          console.log('La empresa es: ', this.empresa);
         });
     });
 
@@ -221,19 +164,39 @@ export class ReportsComponent {
         this.clientes = clients.objeto;
         this.mensaje = clients.mensaje;
       }
-      console.log(this.mensaje, this.clientes);
     });
 
-    this._rgfacturaService.getAllRgFacturas().subscribe((formularioRg90) => {
-      if (formularioRg90.mensaje == 'No hay registros') {
-        this.mensaje = formularioRg90.mensaje;
-        this.facturasRq90 = [];
+    this._rgfacturaService.showAllORderASC().subscribe((rgFacturas) => {
+      if (rgFacturas.mensaje == 'No hay registros') {
+        this.mensaje = rgFacturas.mensaje;
+        this.rgFacturas = [];
       } else {
-        this.facturasRq90 = formularioRg90.objeto;
-        this.mensaje = formularioRg90.mensaje;
+        this.rgFacturas = rgFacturas.objeto;
+        this.mensaje = rgFacturas.mensaje;
       }
-      console.log(this.mensaje, this.facturasRq90);
     });
+
+    this._rgfacturaService.listRg90().subscribe((rgFacturas) => {
+      if (rgFacturas.mensaje == 'No hay registros') {
+        this.mensaje = rgFacturas.mensaje;
+        this.listrg90 = [];
+      } else {
+        this.listrg90 = rgFacturas.objeto;
+        this.mensaje = rgFacturas.mensaje;
+      }
+      this.dataSource = new MatTableDataSource(this.listrg90);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    });
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   async downloadRG90() {
@@ -289,28 +252,70 @@ export class ReportsComponent {
         facturasRq90.timbradoComprobanteAsociado;
       data.push(this.formularioRg90);
     });
-    // const headers = ['Name', 'Age', 'Email'];
-    // const data = [
-    //   { Name: 'John Doe', Age: 30, Email: 'john.doe@example.com' },
-    //   { Name: 'Jane Smith', Age: 25, Email: 'jane.smith@example.com' },
-    // ];
-
     const ruc = '3968935';
     const periodo = '03' + '2024';
     const tipoFormulario = 'REG';
-
     let nombreArchivo =
       ruc + '_' + tipoFormulario + '_' + periodo + '_' + '20083';
-
     const csvBlob = this.csvService.generateCsv(data);
     const zipBlob = await this.zipService.compressCsvFile(
       csvBlob,
       nombreArchivo + '.csv'
     );
-
     const link = document.createElement('a');
     link.href = URL.createObjectURL(zipBlob);
     link.download = nombreArchivo + '.zip';
     link.click();
+  }
+
+  listarFacturas(factura: RgFactura) {
+    const temp: RgFactura[] = [];
+    for (let index = 0; index < this.rgFacturas.length; index++) {
+      console.log(this.rgFacturas[index].anhoPeriodo === factura.anhoPeriodo);
+
+      if (
+        this.rgFacturas[index].anhoPeriodo === factura.anhoPeriodo &&
+        this.rgFacturas[index].mesPeriodo === factura.mesPeriodo &&
+        this.rgFacturas[index].ruc === factura.ruc
+      ) {
+        temp.push(this.rgFacturas[index]);
+      }
+    }
+
+    this.listRg90Desglosado.mes = factura.mesPeriodo;
+    this.listRg90Desglosado.anho = factura.anhoPeriodo;
+    this.listRg90Desglosado.ruc = factura.ruc;
+    this.listRg90Desglosado.razonSocial = factura.razonSocial;
+    this.listRg90Desglosado.estadoRg90 = 'GENERADO';
+    this.listRg90Desglosado.rgFactura = temp;
+
+    this.dataSourceSeleccionado = new MatTableDataSource(
+      this.listRg90Desglosado.rgFactura
+    );
+    this.dataSourceSeleccionado.paginator = this.paginator;
+    this.dataSourceSeleccionado.sort = this.sort;
+
+    this.textoCabeceraModalListaFacturas =
+      'Ruc: ' +
+      factura.ruc +
+      ' Periodo: ' +
+      factura.mesPeriodo +
+      '/' +
+      factura.anhoPeriodo +
+      ' fue seleccionado';
+    console.log('Recibe la factura_', this.listRg90Desglosado);
+  }
+
+  editarAprobado(factura: Factura, tipo: string) {
+    console.log(factura);
+  }
+
+  filtradoRg90() {
+    console.log('Lista Agrupada', this.listrg90);
+    console.log('Lista de RgFacturas', this.rgFacturas);
+  }
+
+  restaurarFiltos() {
+    this.ngOnInit();
   }
 }
