@@ -20,7 +20,7 @@ import { Cliente } from '../../core/model/Cliente';
 import { Empresa } from '../../core/model/Empresa';
 import { Factura } from '../../core/model/Factura';
 import { FormularioRG90 } from '../../core/model/FormularioRG90';
-import { ListRg90Desglosado } from '../../core/model/listRg90Desglosado';
+import { ListRg90Desglosado } from '../../core/model/ListRg90Desglosado';
 import { RgFactura } from '../../core/model/RgFactura';
 import { User } from '../../core/model/User';
 import { ClienteService } from '../../core/services/cliente.service';
